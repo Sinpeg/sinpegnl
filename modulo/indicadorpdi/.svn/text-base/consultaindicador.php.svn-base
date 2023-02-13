@@ -1,0 +1,285 @@
+<?php
+$sessao = $_SESSION['sessao'];
+$codestruturado = $sessao->getCodestruturado();
+$anobase=$sessao->getAnobase();
+$codUnidade = $sessao->getCodunidade();
+$aplicacoes = $sessao->getAplicacoes(); // código das aplicações
+
+if (!$aplicacoes[38]) {
+    print "Erro ao acessar esta aplicação";
+    exit();
+}
+
+if (!empty($_POST['codigo'])){
+   $_SESSION['codmapa'] = addslashes($_POST['codigo']);
+   $codmapa=$_POST['codigo'];
+}else{
+$codmapa=$_SESSION['codmapa'];
+}
+ $daomapa=new MapaDAO();
+ $rows1=$daomapa->buscamapa($codmapa );
+ 	foreach ($rows1 as $row) {
+      $coddocumento= $row['CodDocumento'];
+ 	}
+ 
+ $_SESSION['coddoc'] = $coddocumento;	
+$daometa = new MetaDAO();
+$daomapaind = new MapaIndicadorDAO();
+$objmapaind = array();
+$daoind = new IndicadorDAO();
+$objind = array();
+$daoobjetivo = new ObjetivoDAO();
+
+
+$cont = 0;
+        $rowsobjetivo = $daoobjetivo->buscaObjetivoPorMapa($codmapa);
+		$objobjetivo = new Objetivo();
+		foreach ($rowsobjetivo as $rowobjetivo)
+		{
+			$objobjetivo->setCodigo($rowobjetivo['codobj']);
+			$objobjetivo->setObjetivo($rowobjetivo['des']);
+		}
+	//busca no pdi os indicadores vinculados ao objetivo do pdi, que foi inserido no pdu
+/*$c= new Controlador();
+if (!$c->getProfile($sessao->getGrupo())){	
+	$rowspdi=$daomapaind->buscaIndicadorVinculadoAoObjetivoIncluidoNoPDU($anobase, $objobjetivo->getCodigo(), $codUnidade);
+	
+    foreach ($rowspdi as $r){
+		 $rowsmi=$daomapaind->buscamapa($r['codIndicador'], $codmapa, $codUnidade);//vê se o indicador já está no mapa do pdu
+		 $codigo=0;
+		 foreach ($rowsmi as $o){
+		   $codigo=$o['codIndicador'];
+		 }
+		 $passou=0;
+		 if ($codigo==0){//o indicador do pdi nao está no pdu
+		   $daomapaind->insere($r['codIndicador'], $codmapa, $codUnidade);
+		   $passou=1;
+		   $rows=$daomapaind->buscamapa($r['codIndicador'], $codmapa, $codUnidade);
+		   foreach ($rows as $r1){
+		   	$codigominovo=$r1['codigo'];
+		   }
+		 }
+	}
+	
+	
+}*/
+	//-------------------------
+   if ($codUnidade==938){
+     $rows = $daomapaind->buscaporMapaSemUnidade($codmapa);//busca indicador vinculado com objetivo
+   }else{
+    $rows = $daomapaind->buscaporMapaUnidade($codmapa,$codUnidade);
+   }
+	foreach ($rows as $row) {
+		
+		$cont++;
+		$objmapaind[$cont] = new Mapaindicador();
+		
+		$objmapaind[$cont]->setCodigo($row['codigo']);		
+	    $rowsindicador = $daoind->buscaindicador($row['codIndicador']);
+	   
+		foreach ($rowsindicador as $rowindicador)
+		{
+			$objind[$cont] = new Indicador();
+			$objind[$cont]->setCodigo($rowindicador['Codigo']);			
+			$objind[$cont]->setNome($rowindicador['nome']);
+			$objind[$cont]->setCalculo($rowindicador['calculo']);
+		}
+		
+		$objmapaind[$cont]->setIndicador($objind[$cont]);
+		
+		
+		$mapa1=new Mapa();
+		$mapa1->setCodigo($row['codMapa']);
+		
+		$objmapaind[$cont]->setMapa($mapa1);
+		
+		$objmapaind[$cont]->setPropindicador($row['PropIndicador']);
+		
+		$querymeta = $daometa->buscaMetaResultadoporCodMapaIndiOnly($row['codigo']);//busca meta pelo mapaindicador
+		
+		$cont2 = 0;
+		//monta vetor de metas do indicador
+		foreach ($querymeta as $m1){
+			$c=new Calendario();
+			$c->setAnoGestao($m1['ano']);
+			$objmapaind[$cont]->adicionaItemMeta($m1['Codigo'], $m1['periodo'], $c, $m1['meta'], $m1['ano'], $m1['metrica'], NULL, $cont2++);
+			
+		}
+			
+		$objind[$cont]->setMapaIndicador($objmapaind[$cont]);	
+		
+	    
+	}
+	
+	
+?>
+<script>
+    $(function() {
+        $("#tablesorter")
+                .tablesorter({
+                    widthFixed: true,
+                    headers: {
+                        3: {
+                            sorter: false
+                        }
+                    },
+                    widgets: ['zebra']
+                }
+                ).tablesorterPager(
+                {
+                    container: $("#pager"),
+                    positionFixed: false,
+                    size: 10
+                });
+
+    });
+
+    function deletaindicador(button){
+		var confirmacao = confirm("você realmente deseja excluir esta linha?");
+		if(confirmacao == true){
+        $.ajax({url: "ajax/indicadorpdi/deletamapaindicador.php", type: 'POST', data: { codindicador: button.value, action : "D"}, success: function(data) {
+        	 $('div#message').html(data);
+        	 var teste = "#"+button.id;
+        	 teste = $(teste).parent().parent();
+        	 teste.remove();
+            }});
+		}
+}
+
+    
+</script>
+
+	<div class="bs-example">
+		<ul class="breadcrumb">
+			<li class="active"><a href="<?php echo Utils::createLink('mapaestrategico', 'listamapapdu'); ?>">Painel Tático</a> >> <a href="#" >Indicadores Vinculados</a></li>  
+		</ul>
+	</div>
+                <legend>Indicadores Vinculados</legend>
+    
+    <?php 
+     print ( 'Objetivo:'. $objobjetivo->getObjetivo());
+    
+     if ($cont==0){
+     	print '<br><br><p color="red">Não há indicadores vinculados a este objetivo!</p>';
+     }
+    ?>
+    <hr style="border-top: 1px solid #0b559b;"/>
+       
+   <div id="message"></div>
+   
+     <?php  if ($cont!=0){ ?>
+     
+   <table   class="tablesorter-dropbox" >
+    <tfoot>
+        <tr>
+            <th colspan="7" class="ts-pager form-horizontal">
+                <button type="button" class="btn first"><i class="icon-step-backward glyphicon glyphicon-step-backward"></i></button>
+                <button type="button" class="btn prev"><i class="icon-arrow-left glyphicon glyphicon-backward"></i></button>
+                <span class="pagedisplay"></span> <!-- this can be any element, including an input -->
+                <button type="button" class="btn next"><i class="icon-arrow-right glyphicon glyphicon-forward"></i></button>
+                <button type="button" class="btn last"><i class="icon-step-forward glyphicon glyphicon-step-forward"></i></button>
+                <select class="pagesize input-mini" title="Select page size">
+                    <option selected="selected" value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                    <option value="40">40</option>
+                </select>
+                <select class="pagenum input-mini" title="Select page number"></select>
+            </th>
+        </tr>
+    </tfoot>
+        <thead>
+            <tr>
+                <th>Indicador</th>
+                <th>Fórmula</th>
+                <th>Cadastrar Meta</th>
+                <th>Desvincular</th>
+            </tr>
+        </thead>
+        <tbody>
+        
+        
+            <?php for ($i = 1; $i <= $cont; $i++) {       	?>
+                <tr>
+                    <td><?php print ($objind[$i]->getNome()); ?></td>
+                    <td><?php print ($objind[$i]->getCalculo()); ?></td> 
+                    
+                    <?php 
+                   
+                    if ($objmapaind[$i]!=null && $objmapaind[$i]->getArraymeta()==null ){?>   
+                    <td> 
+ <!--<a href="<?php // echo Utils::createLink('indicadorpdi', 'cadastrarmeta'); ?>"><img src="webroot/img/add.png"/></a>-->
+
+<form method="post" action="<?php  echo Utils::createLink('indicadorpdi', 'cadastrarmeta'); ?>">
+<input type="hidden" name="ind" value="<?php echo $objind[$i]->getCodigo(); ?>" />
+<input type="hidden" name="coddoc" value="<?php echo $coddocumento; ?>" />
+<input type="hidden" name="mapaind" value="<?php echo $objind[$i]->getMapaIndicador()!=null?$objind[$i]->getMapaIndicador()->getCodigo():""; ?>" />
+
+<input type='image' value="editar" src="webroot/img/add.png" onClick="this.form.submit()" />
+</form>
+
+</td>
+                     <?php }else{?> 
+                      <td>
+   <form method="post" action="<?php  echo Utils::createLink('indicadorpdi', 'editarmeta'); ?>">
+<input type="hidden" name="ind"value="<?php echo $objind[$i]->getCodigo(); ?>" />
+<input type="hidden" name="coddoc"value="<?php echo $coddocumento; ?>" />
+<!-- <input type="hidden" name="codobjpdi"value="<?php // echo $objobjetivo->getCodigo(); ?>" />-->
+<input type="hidden" name="mapaind"value="<?php echo $objind[$i]->getMapaIndicador()!=null?$objind[$i]->getMapaIndicador()->getCodigo():""; ?>" />
+<input type='image' value="editar" src="webroot/img/editar.gif" onClick="this.form.submit()" />
+</form>
+                <!--  <a href="<?php // echo Utils::createLink('indicadorpdi', 'editarmeta'); ?>"><img src="webroot/img/editar.gif"/></a> -->
+                     </td>
+                                
+                      <?php }//if  ?> 
+                    <td>
+                    
+                    
+                 <button style="border: none" onclick="deletaindicador(this)" id="<?php echo "btn{$i}"; ?>" value="<?php echo ($objind[$i]->getMapaIndicador()->getCodigo()); ?>"><img src ="webroot/img/delete.png"/></button>
+                    
+                    </td>
+                                    </tr>
+            <?php }//for ?>
+
+        </tbody>
+      
+    </table>
+    
+      <?php } ?>
+    <div>
+		      
+    <a href="<?php echo Utils::createLink('indicadorpdi', 'consultaindicadorproprio'); ?>" >
+    <button  type="button" class="btn btn-primary btn">Consultar Indicadores</button></a>  
+    
+  <!--  <a href="<?php //echo Utils::createLink('indicadorpdi', 'cestaindicadores'); ?>" >
+    <button  type="button" class="btn btn-primary btn">Consultar Cesta de Indicadores</button></a>  -->  
+    
+  
+		      
+               
+               
+               
+    </div>
+
+<?php 
+/*$contv=$cont;
+	//indicadores não vinculados que nao sao da cesta
+	    $rows1 = $daoind->buscaIndicadoresForaCesta($codmapa);
+	    foreach ($rows1 as $rowindicador)
+		{
+			$cont++;
+			$objind[$cont] = new Indicador();
+			$objind[$cont]->setCodigo($rowindicador['Codigo']);
+			$objind[$cont]->setNome($rowindicador['nome']);
+			$objind[$cont]->setCalculo($rowindicador['calculo']);
+			$objind[$cont]->setMapaIndicador(null);
+			echo $cont."indicador sem vinculo";
+		}
+		if ($objmapaind[$cont]==null ){
+			echo "xxx";
+		}else{
+			echo "yyy";
+		}*/
+
+
+?>

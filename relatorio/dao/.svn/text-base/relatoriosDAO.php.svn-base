@@ -1,0 +1,153 @@
+<?php
+class RelatoriosDAO extends PDOConnectionFactory{
+	
+	public $conex = null;
+	
+	public  function  premios($ano_base,$cod_unidade){
+		try {
+			$sql = "SELECT u.nomeunidade,s.nomeunidade as subunidade ,`OrgaoConcessor`,case when `Categoria`=1 then 'Discente'
+			when `Categoria`=2 then 'Docente'
+			else 'Tecnico Administrativo' end as categorias
+			,`Nome`,`Quantidade`,case when `Reconhecimento`=1  then 'Premios'
+			 when `Reconhecimento`=2  then 'Distincoes'
+			  when `Reconhecimento`=3  then 'Titulos'
+			 when `Reconhecimento`=4  then 'Honrarias'
+			 when `Reconhecimento`=5  then 'Portaria de Reconhecimento'
+			  when `Reconhecimento`=6  then 'Certificacao'
+			end as Reconhecimento
+			,`infocomplementar`
+			FROM `premios` p inner join unidade s on p.`CodSubunidade`=s.`CodUnidade`
+			inner join unidade u on p.`CodUnidade`=u.`CodUnidade`
+			WHERE ano=:ano_base AND u.CodUnidade=:cod_unidade
+			order by u.nomeunidade,s.nomeunidade";
+		
+			$stmt = parent::prepare($sql);
+			$stmt->execute(array(':ano_base'=>$ano_base,':cod_unidade'=>$cod_unidade));
+			return $stmt;
+		} catch (PDOException $ex) {
+			echo "Erro: " . $ex->getMessage();
+		}
+	}
+
+	public  function  premiosAdm($ano_base){
+		try {
+			$sql = "SELECT u.nomeunidade,s.nomeunidade as subunidade ,`OrgaoConcessor`,case when `Categoria`=1 then 'Discente'
+			when `Categoria`=2 then 'Docente'
+			else 'Tecnico Administrativo' end as categorias
+			,`Nome`,`Quantidade`,case when `Reconhecimento`=1  then 'Premios'
+			 when `Reconhecimento`=2  then 'Distincoes'
+			  when `Reconhecimento`=3  then 'Titulos'
+			 when `Reconhecimento`=4  then 'Honrarias'
+			 when `Reconhecimento`=5  then 'Portaria de Reconhecimento'
+			  when `Reconhecimento`=6  then 'Certificacao'
+			end as Reconhecimento
+			,`infocomplementar`
+			FROM `premios` p inner join unidade s on p.`CodSubunidade`=s.`CodUnidade`
+			inner join unidade u on p.`CodUnidade`=u.`CodUnidade`
+			WHERE ano=:ano_base 
+			order by u.nomeunidade,s.nomeunidade";
+	
+			$stmt = parent::prepare($sql);
+			$stmt->execute(array(':ano_base'=>$ano_base));
+			return $stmt;
+		} catch (PDOException $ex) {
+			echo "Erro: " . $ex->getMessage();
+		}
+	}
+	
+	//Exporta o relatório de produção intelectual para o user ADMIN
+	public  function  producaoAdm($ano_base){
+		try {
+			$sql = "SELECT CASE WHEN tp.Anuario = 'A' THEN 'Artística' 
+					WHEN tp.Anuario = 'B' THEN 'Bibliográfica' 
+					WHEN tp.Anuario = 'O' THEN 'Bibliográfica' 
+					WHEN tp.Anuario = 'T' THEN 'Técnica' 
+					END AS tipo, tp.Nome, SUM( p.Quantidade ) AS quant FROM prodintelectual AS p JOIN tdm_prodintelectual AS tp ON ( p.Tipo = tp.Codigo )
+					WHERE p.Ano =:ano_base
+					AND tp.Validade =2014
+					GROUP BY tp.Anuario, tp.Nome";
+
+			$stmt = parent::prepare($sql);
+			$stmt->execute(array(':ano_base'=>$ano_base));
+			return $stmt;
+		} catch (PDOException $ex) {
+			echo "Erro: " . $ex->getMessage();
+		}
+	}
+	
+	//Exportar o relatório de biblioteca para o user ADMIN
+	public  function  bibliotecaAdm($ano_base){
+		try {
+			$sql = "SELECT `codEmec` , e.`nome` AS nome ,
+			case when `tipo`=2 then 'setorial' else 'central' end as Tipo ,
+			`nAssentos` as assentos ,
+			`nEmpDomicilio` as 'Emprestimo a Domicilio' ,
+			`nEmpBiblio` as 'Emprestimo entre bibliotecas',
+			`nUsuariosTpc` as 'Usuarios treinados em capacitação' ,
+			`tapi` as 'Periodicos impressos',
+			`tali` as 'Livros impressos' ,
+			`tomi` as 'Outros materiais impressos' ,
+			`tape` as 'Acervo de periodicos eletronicos',
+			`tale` as 'Acervo de livros eletronicos' ,			
+			
+			case when `fBuscaIntegrada`=1 then 'Sim' else 'Não' end as 'Busca Integrada' ,
+			case when `comutBibliog`=1 then 'Sim' else 'Não' end as 'Comutação Bibliografica' ,
+			case when `servInternet`=1 then 'Sim' else 'Não' end as 'Serviço de Internet',
+			case when `redeSemFio`=1 then 'Sim' else 'Não' end as 'REde sem fio' ,
+			case when `partRedeSociais`=1 then 'Sim' else 'Não' end as 'Part redes sociais',
+			case when `atendTreiLibras`=1 then 'Sim' else 'Não' end as 'Atendente em libras' ,
+			
+			case when `acervoFormEspecial`=1 then 'Sim' else 'Não' end as 'Acervo form especial',
+			case when `appFormEspecial`=1 then 'Sim' else 'Não' end as '2a' ,
+			case when planoFormEspecial=1 then 'Sim' else 'Não' end as 'plano em form especial',
+			
+			case when `sofLeitura`=1 then 'Sim' else 'Não' end as 'sof leitura baixa visao' ,
+			case when `impBraile`=1 then 'Sim' else 'Não' end as 'impressoras braile',
+			case when `tecVirtual`=1 then 'Sim' else 'Não' end as 'teclado virtual',
+						
+			case when `portalCapes`=1 then 'Sim' else 'Não' end as 'Parte portal capes' ,
+			case when `outrasBases`=1 then 'Sim' else 'Não' end as 'Assina outras bases',
+			case when `bdOnlineSerPub`=1 then 'Sim' else 'Não' end as 'Repositorio Inst de serv publico',
+			case when `catOnlineSerPub`=1 then 'Sim' else 'Não' end as 'Cat. on line de serv publico' ,
+			
+			`justificativa` ,l.nome AS abrangencia
+			FROM `bibliemec` e left join `biblicenso` c on e.`idBibliemec` = c.`idBibliemec`
+			left join bloferta f on f.`idBibliemec`= e.`idBibliemec`
+			left join localoferta l on l.idLocal = f.idloferta
+			WHERE e.`situacao` = 'A'
+			AND ano =:ano_base
+			order by e.nome";
+	
+			$stmt = parent::prepare($sql);
+			$stmt->execute(array(':ano_base'=>$ano_base));
+			return $stmt;
+		} catch (PDOException $ex) {
+			echo "Erro: " . $ex->getMessage();
+		}
+	}
+	
+	
+	//Exporta o relatório de produção da saúde
+	public  function  producaoSaude($ano_base){
+		try {
+			$sql = "SELECT  us.NomeUnidade AS Subunidade, ups.NomeUnidade AS Localizacao, s.Nome AS nomeServico, p.Nome AS nomeProcedimento,  ps.Ano, sum(ps.ndiscentes) AS nDiscentes, sum(ps.ndocentes) AS nDocentes, sum(ps.npesquisadores) AS nPesquisadores, sum(ps.npessoasatendidas) AS nPessoasAtendidas,sum(ps.nprocedimentos) AS nProcedimentos
+                FROM psaudemensal ps, servproced sp, procedimento p, servico s, unidade us, unidade ups
+                WHERE s.Codigo = sp.CodServico
+                AND sp.CodProced = p.CodProcedimento
+                AND ps.CodServProc = sp.CodServProc
+                AND ps.CodLocal = ups.CodUnidade
+                AND s.CodSubunidade = us.CodUnidade
+               
+                AND ps.Ano =:ano_base
+                group BY us.NomeUnidade , ups.NomeUnidade, s.Nome , p.Nome
+                order by us.NomeUnidade , ups.NomeUnidade, s.Nome , p.Nome";
+	
+			$stmt = parent::prepare($sql);
+			$stmt->execute(array(':ano_base'=>$ano_base));
+			return $stmt;
+		} catch (PDOException $ex) {
+			echo "Erro: " . $ex->getMessage();
+		}
+	}
+}
+?>

@@ -1,0 +1,83 @@
+<?php 
+
+
+function subtopico($topico,$cont,$codunidade,$anobase){
+	$cont1=0;
+	$ncont=$cont;
+foreach ($topico as $t){
+	//echo "passou".$t->getNome()."<br>";
+	$cont++;
+    
+	$cont1++;
+ ?>
+
+   
+		<h3>	  
+		        	<?php 
+		        	   //$ordemanterior=$cont1>1?$inicio:$ordemanterior;
+		        	   //$ordem=$ordemanterior.".".$t->getOrdem();
+		        	   print $t->getNivel()." ".$t->getNome();
+		        	    
+		           ?>
+		  </h3>	
+		  <div>     
+		  
+		       	<form method="post"  name="frm<?php print $t->getCodigo();?>" >
+		       	       <div id="msg<?php print $t->getCodigo()?>"></div>    
+		       	       <input type="hidden" name="codunidade<?php print $t->getCodigo()?>" value=<?php print $codunidade;?> />
+                       <input type="hidden" name="anobase<?php print $t->getCodigo()?>" value=<?php print $anobase;?> />
+		 		       <input type="hidden" name="codtopico<?php print $t->getCodigo()?>" value="<?php print $t->getCodigo();?>" />
+		 		       <input type="hidden" name="codtexto<?php print $t->getCodigo()?>" value=<?php print$t->getTexto()==NULL?"":$t->getTexto()->getCodigo(); ;?> />
+		 		       
+				       <textarea id="area<?php print $t->getCodigo()?>"   name="texto<?php print $t->getCodigo()?>" > 
+<?php if ($t->getTexto()!=NULL  ){
+		                   print $t->getTexto()->getDesctexto(); 
+                          }else if ($t->getModelos()!=NULL ){
+		                   foreach ($t->getModelos() as $m){
+		                   	if ($m->getlegenda()==NULL || $m->getlegenda()=="")
+		                      	echo $m->getmodelo();
+		                   	else echo $m->getlegenda().$m->getmodelo();
+		                   }
+                          }
+		                   ?>
+		           
+		           
+		           </textarea>
+		           <br>
+		               <input type="button" name="acao" value="Concluir"  id="gravatopico<?php print $t->getCodigo()?>"  class="btn btn-primary btn">
+				  
+		       </form>
+  	        <script>
+				   	$(document).ready(function() {
+						var teste="#area<?php print $t->getCodigo()?>";
+						  $(teste).summernote({
+							  height: 450,
+							  lang:'pt-BR',
+						      placeholder: 'Redija o texto!',	       
+						  });
+					});
+							$('#gravatopico<?php print $t->getCodigo()?>').click(function() {
+								   $.ajax({
+								      url:"ajax/raa/registraTexto.php",
+								      type: 'POST',
+								      data: $("form[name=frm<?php print $t->getCodigo();?>]").serialize(),
+								      success: function(data) {
+								           $("div#msg<?php print $t->getCodigo()?>").html(data);
+								      }
+								     
+								  });
+								});
+						
+						</script>  
+</div>
+   		          
+        
+<?php
+		if ($t->getSubtopicos()!=NULL){
+			subtopico($t->getSubtopicos(),$cont,$codunidade,$anobase);
+		}
+}//for
+return $cont;
+}
+
+?>

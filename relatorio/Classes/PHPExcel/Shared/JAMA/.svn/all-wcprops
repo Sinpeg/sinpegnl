@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Shared/JAMA
+END
+CHANGELOG.TXT
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Shared/JAMA/CHANGELOG.TXT
+END
+QRDecomposition.php
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Shared/JAMA/QRDecomposition.php
+END
+Matrix.php
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Shared/JAMA/Matrix.php
+END
+EigenvalueDecomposition.php
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Shared/JAMA/EigenvalueDecomposition.php
+END
+CholeskyDecomposition.php
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Shared/JAMA/CholeskyDecomposition.php
+END
+SingularValueDecomposition.php
+K 25
+svn:wc:ra_dav:version-url
+V 119
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Shared/JAMA/SingularValueDecomposition.php
+END
+LUDecomposition.php
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Shared/JAMA/LUDecomposition.php
+END

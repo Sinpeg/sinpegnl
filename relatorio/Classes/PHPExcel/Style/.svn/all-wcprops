@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Style
+END
+Border.php
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Style/Border.php
+END
+NumberFormat.php
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Style/NumberFormat.php
+END
+Alignment.php
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Style/Alignment.php
+END
+Protection.php
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Style/Protection.php
+END
+Borders.php
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Style/Borders.php
+END
+Fill.php
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Style/Fill.php
+END
+Supervisor.php
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Style/Supervisor.php
+END
+Conditional.php
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Style/Conditional.php
+END
+Font.php
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Style/Font.php
+END
+Color.php
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Style/Color.php
+END

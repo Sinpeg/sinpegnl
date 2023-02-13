@@ -1,0 +1,105 @@
+<?php
+$sessao = $_SESSION["sessao"];
+$aplicacoes = $sessao->getAplicacoes();
+
+require_once 'classes/modelo.php';
+require_once 'dao/modeloDAO.php';
+require_once 'dao/topicoDAO.php';
+require_once 'dao/subtopicoDAO.php';
+
+//Busca Unidades
+$daoUnidade = new UnidadeDAO();
+$rowU = $daoUnidade->Lista();
+
+
+//Buscar Tópicos
+$daoTopicos = new RaaDAO();
+$rowsT = $daoTopicos->buscartopicos($codunidade,$anobase);//Buscar Tópicos
+
+//Buscar Subtópicos
+$subtopicoDAO = new SubtopicoDAO();
+$rowsS = $subtopicoDAO->buscarsubtopicosunidade($codunidade,$anobase);
+
+//Buscar dados do modelo
+$codModelo = $_GET['modelo'];
+$modeloDAO = new ModeloDAO();
+$rowModelo = $modeloDAO->buscarModeloCod($codModelo);
+foreach ($rowModelo as $row){
+	$legenda = $row['legenda'];
+	if($row['situacao'] == 1){
+		$check = "checked";
+	}else{
+		$check = "";
+	}
+	$modelo = $row['descModelo'];
+	$codTopico = $row['codTopico'];
+}
+
+//Buscar Tópico Selecionado
+$rowTopicoSelecionado = $daoTopicos->buscarTopicoCod($codTopico);
+foreach ($rowTopicoSelecionado as $row){
+	$codigoTopicoSel = $row['codigo'];
+	$tituloTopicoSel = $row['titulo'];
+	$codUnidade = $row['codUnidade'];
+}
+
+//Declaração de variáveis
+$vetTopicos = array(); // Vetor para guardar os registros de tópicos
+$count = 0;	//Contador
+?>
+
+<head>
+	<div class="bs-example">
+		<ul class="breadcrumb">
+		<li><a href="<?php echo Utils::createLink("raa", "consultarModelos"); ?>">Consultar Modelos</a></li>
+			<li class="active">Editar Modelo</li>
+		</ul>
+	</div>
+</head>
+<fieldset>
+		<div id="msg"></div>
+        <legend>Editar Modelo</legend>
+        <form name="form-editarModelo" id="form-editarModelo" method="POST">
+        <table>
+        	<tr><td>Tópico / Subtopico:</td>
+        	<td><select class="form-control" name="topico" id="topico">
+        		<option value="<?php echo $codigoTopicoSel?>"><?php echo $tituloTopicoSel;?></option>
+        		<option value="0"><i>-- Selecione --</i></option>
+        	<?php 
+        	foreach ($rowsT as $row){
+        		echo '<option value="'.$row['codigo'].'">'.$row['titulo'].'</option>';
+        	}
+        	
+        	foreach ($rowsS as $row){
+        		echo '<option value="'.$row['codigo'].'">'.$row['titulo'].'</option>';
+        	}
+        	?>
+        	</select></td></tr>
+        	<?php
+        		if($codunidade == 100000){ 
+        			echo '<tr><td>Unidade</td><td><select name="unidade" class="form-control">';
+	        		if($codUnidade == NULL){
+	        			echo '<option selected value="">Todas as Unidades</option>';
+	        		}
+	        		
+	        		foreach ($rowU as $row){
+	        			echo '<option value="'.$row['CodUnidade'].'">'.$row['NomeUnidade'].'</option>';
+	        		}
+	        		echo '</select></td></tr>';
+	        	}else{
+	        		echo '<input name="codUnidade" value="'.$codunidade.'" type="hidden" />';
+	        	}
+        	?>
+        	<tr><td>Legenda:</td><td><input type="text" value="<?php echo $legenda;?>" class="form-control" name="legenda" id="legenda"/></td></tr>
+        	<tr><td>Válido:</td><td><input type="checkbox" name="situacao" <?php echo $check;?> value="1" id="situacao"/></td></tr>
+        	<tr><td>Modelo:</td><td></td></tr>
+        	<tr><td colspan="2"><textarea cols="10" name="modelo"  id="editorModelo" name="editordata"><?php echo $modelo;?></textarea> </td></tr>
+        </table>
+        	<!-- Campos Hidden -->
+        	<input name="operacao" value="A" type="hidden" />
+        	<input name="codModelo" value="<?php echo $_GET['modelo'];?>" type="hidden" />
+        </form><br/>       
+        
+        <button type="button" id="btnEditarModelo" class="btn btn-primary">Gravar</button>
+        
+</fieldset>      

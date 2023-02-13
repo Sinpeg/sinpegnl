@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Shared/trend
+END
+logarithmicBestFitClass.php
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Shared/trend/logarithmicBestFitClass.php
+END
+exponentialBestFitClass.php
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Shared/trend/exponentialBestFitClass.php
+END
+powerBestFitClass.php
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Shared/trend/powerBestFitClass.php
+END
+trendClass.php
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Shared/trend/trendClass.php
+END
+bestFitClass.php
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Shared/trend/bestFitClass.php
+END
+linearBestFitClass.php
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Shared/trend/linearBestFitClass.php
+END
+polynomialBestFitClass.php
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Shared/trend/polynomialBestFitClass.php
+END

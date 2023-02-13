@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Chart
+END
+Title.php
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Chart/Title.php
+END
+DataSeries.php
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Chart/DataSeries.php
+END
+Properties.php
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Chart/Properties.php
+END
+DataSeriesValues.php
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Chart/DataSeriesValues.php
+END
+Layout.php
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Chart/Layout.php
+END
+Axis.php
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Chart/Axis.php
+END
+PlotArea.php
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Chart/PlotArea.php
+END
+GridLines.php
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Chart/GridLines.php
+END
+Exception.php
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Chart/Exception.php
+END
+Legend.php
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Chart/Legend.php
+END

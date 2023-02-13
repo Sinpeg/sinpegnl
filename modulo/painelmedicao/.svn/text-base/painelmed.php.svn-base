@@ -1,0 +1,71 @@
+<?php
+/* Sessão utilizada para esta aplicação é a PDI_PAINEL */
+//session_start();
+$sessao = $_SESSION['sessao'];
+if (!isset($sessao)) {
+	exit();
+}
+
+
+$unidade = new Unidade();
+$unidade->setCodunidade($sessao->getCodUnidade());
+$codunidade=$unidade->getCodunidade();
+$anogestao=$sessao->getAnobase();
+
+
+
+// var_dump($_POST);
+
+
+?>
+<fieldset>
+    <legend>Painel de Medições</legend>
+    <form name="pdi-painelres" id="pdi-painelres">
+        <div>
+        <table>
+        <tr><td>
+            <label>Documento: </label></td>
+            <td>
+            <select name="coddocumento"  class="sel1">
+                <option value="0">Selecione o documento...</option>
+                <?php
+                $daodoc = new DocumentoDAO();
+	                	$docufpa = $daodoc->buscadocumentoPrazo($anogestao);
+                ?>
+                
+                <?php foreach ($docufpa as $row){ ?>
+                		<?php $ano = $row['anoinicial']; ?>
+                    	<option value=<?php print $row["codigo"]; ?>><?php print $row['nome'] ?><?php print ' (' . $row['anoinicial'] . '-' . $row['anofinal'] . ')'; ?></option>
+                <?php }
+                
+                ?>
+            </select>
+            </td>
+          </tr>  
+           
+               </table>
+            <input type="submit" value="Buscar" id="resposta-ajax-doc1" class="btn btn-primary btn" />
+            
+            
+        </div>
+    </form>
+</fieldset>
+<div id="mapa"></div>
+
+<script>
+$('#resposta-ajax-doc1').click(function(event) {
+    event.preventDefault();
+    $("#mapa").html("");
+    $("#mapa").addClass("ajax-loader");
+    $.ajax({
+        url: 'ajax/painelmedicao/buscapainelmed.php',
+        type: "POST",
+        data: $("form").serialize(),
+        success: function(data) {
+            $("#mapa").html(data);
+            $("#mapa").removeClass("ajax-loader");
+        }
+    });
+});
+
+</script>

@@ -1,0 +1,187 @@
+<?php
+/* DAO */
+require_once '../../dao/PDOConnectionFactory.php';
+require_once '../../classes/sessao.php';
+require_once '../../classes/unidade.php';
+require_once '../../dao/unidadeDAO.php';
+require_once '../../modulo/documentopdi/dao/DocumentoDAO.php';
+require_once '../../modulo/mapaestrategico/dao/MapaDAO.php';
+require_once '../../modulo/indicadorpdi/dao/IndicadorDAO.php';
+require_once '../../modulo/indicadorpdi/dao/MapaIndicadorDAO.php';
+require_once '../../modulo/metapdi/dao/MetaDAO.php';
+/* Model */
+require_once '../../modulo/documentopdi/classe/Documento.php';
+require_once '../../modulo/mapaestrategico/classes/Mapa.php';
+require_once '../../modulo/indicadorpdi/classe/Indicador.php';
+require_once '../../modulo/metapdi/classe/Meta.php';
+require_once '../../util/Utils.php';
+?>
+<?php
+session_start();
+$sessao = $_SESSION['sessao'];
+$codmapa = $_SESSION['codmapa'];
+$codestruturado = $sessao->getCodestruturado();
+$codunidade = $sessao->getCodunidade();
+$aplicacoes = $sessao->getAplicacoes(); // código das aplicações
+?>
+<?php
+if (!$aplicacoes[38]) {
+    print "Erro ao acessar esta aplicação";
+    exit();
+}
+?>
+<?php
+//$coddoc = addslashes($_POST['doc']);
+//$objcod = addslashes($_POST['objetivo']);
+//$propindicador = addslashes($_POST['propindicador']);
+$indicador = addslashes($_POST['indicador']);
+$objeto = addslashes($_POST['objeto']);
+$calculo = strip_tags(addslashes($_POST['calculo']));
+$unidademedida = addslashes($_POST['unidadedemedida']);
+$interpretacao = addslashes($_POST['interpretacao']);
+$metodo = addslashes($_POST['metodo']);
+$benchmarch = addslashes($_POST['benchmarch']);
+$observacoes = addslashes($_POST['observacoes']);
+$acao = addslashes($_POST['acao']);
+$propindicador = addslashes($_POST['cxunidade']);
+
+?>
+<?php
+$erro = "";
+if ($indicador == "") {
+    $erro = "Preencha o nome do indicador!";
+} //else if (!preg_match('/^([1-9]{1})|([1-9][0-9]+)$/', $coddoc)) {
+  //  $erro = "O documento selecionado não existe!";
+//} else if (!preg_match('/^([1-9]{1})|([1-9][0-9]+)$/', $objcod)) {
+//    $erro = "O objetivo selecionado não existe!"; } 
+//    else if ($objeto == "") {
+//    $erro = "Preencha o campo objeto";} 
+else if ($calculo == "") {
+    $erro = "Preencha o campo para a fórmula de cálculo";}
+   // else if ($unidademedida == "") {
+   // $erro = "Preencha o campo Unidade de Medida";
+//} else if ($interpretacao == "") {
+//    $erro = "Preencha o campo Interpretação";
+//} else if ($metodo == "") {
+//    $erro = "Preencha o campo Fonte/Método";
+//} else if ($benchmarch == "") {
+//    $erro = "Preencha o campo Benchmarch";
+//} else if ($observacoes == "") {
+//    $erro = "Preencha o campo Observações";
+//} 
+ 
+else {
+     $daounidade = new UnidadeDAO();
+	
+    $codunidade=$sessao->getCodUnidade();
+    $rows = $daounidade->buscasubunidades00($codestruturado);
+    $unidade = array();
+    $cont = 0;
+    foreach ($rows as $row) {
+        $unidade[$cont] = new Unidade();
+        $unidade[$cont]->setCodunidade($row['CodUnidade']);
+        $unidade[$cont]->setNomeunidade($row['NomeUnidade']);
+        $cont++;
+    }
+    $daodoc = new DocumentoDAO();
+    $objdoc = array();
+    $cont1 = 0;
+    for ($i = 0; $i < $cont; $i++) {
+        $daodoc = new DocumentoDAO();
+        $rows = $daodoc->buscadocumentoporunidade($unidade[$i]->getCodunidade());
+        foreach ($rows as $row) {
+            $objdoc[$cont1] = new Documento();
+            $objdoc[$cont1]->setCodigo($row['codigo']);
+            $objdoc[$cont1]->setNome($row['nome']);
+            $objdoc[$cont1]->setUnidade($unidade[$i]);
+            $objdoc[$cont1]->setAnoFinal($row['anofinal']);
+            $cont1++;
+        }
+    }
+    $daomapa = new MapaDAO();
+    $objmapa = new Mapa();
+    for ($i = 0; $i < $cont1; $i++) {
+        $rows = $daomapa->buscamapadocumento($objdoc[$i]->getCodigo());
+        foreach ($rows as $row) {
+            if ($row['Codigo'] == $objcod) {
+                $objmapa = new Mapa();
+                $objmapa->setCodigo($row['Codigo']);
+                $objmapa->setObjetivo($row['codObjetivoPDI']);
+                $objmapa->setDocumento($objdoc[$i]);
+            }
+        }
+    }
+    $daomapa->fechar();
+    //    if ($objmapa->getDocumento()->getCodigo() == NULL) {
+   //        $erro = "O documento selecionado não pertence à unidade!";
+  //    } else if ($objmapa->getCodigo() == NULL) {
+ //        $erro = "O objetivo estratégico não pertence à unidade!";
+//      }  else {
+//        $anofinal = $objmapa->getDocumento()->getAnoFinal();
+        $validade = "2025-12-31";
+        $objind = new Indicador();
+        $objind->setNome($indicador);
+        $objind->setObjeto($objeto);
+        $objind->setCalculo($calculo);
+        $objind->setValidade($validade);
+        $objind->setUnidademedida($unidademedida);
+        $objind->setInterpretacao($interpretacao);
+        $objind->setMetodo($metodo);
+        $objind->setBenchmarch($benchmarch);
+        $objind->setObservacoes($observacoes); 
+        if ($codunidade==938){      
+             $objind->setCesta($_POST['cesta']);
+            
+        }else{
+        	 $objind->setCesta('4');
+        }
+        $u=new Unidade();
+        $u->setCodunidade($codunidade);
+        $objind->setUnidade($u);
+        
+        $daoind = new IndicadorDAO(); 
+        if ($acao == "A") {
+        	if ($daoind->insere($objind)==1){
+        	  $string = "Dados gravados com sucesso!";
+        	}
+            else $string="Erro na operação de gravação";
+          } 
+        else if ($acao == "E") {
+        	$codind=$_POST['codigo'];
+            $rows = $daoind->buscaindicador($codind);
+            
+            if ($rows->rowCount() == 0) {
+            	
+                $erro = "Indicador não foi encontrado";
+            } else {
+                $today = new DateTime('now');
+                
+                foreach ($rows as $row) {
+                    $objind->setValidade($row['validade']);
+                }
+                $validade = new DateTime($objind->getValidade());
+                if ($today > $validade) {
+                    $erro = "Você não pode mais atualizar este indicador";
+                } else {
+                    $objind->setCodigo($codind);
+                    $daoind->altera($objind);
+                    $string = "Dados atualizados com sucesso!";
+                }
+            }
+        }
+        $daoind->fechar();
+    }
+?>
+<?php if ($erro != ""): ?>
+    <div class="erro">
+        <img src="webroot/img/error.png" width="30" height="30"/>
+        <?php print $erro; ?>
+        <span class="plus"></span><a href="<?php echo Utils::createLink('indicadorpdi', 'consultaindicador'); ?>">Voltar</a>
+    </div>
+<?php else : ?>
+    <div id="success">
+        <img src="webroot/img/accepted.png" width="30" height="30"/>
+        <?php print $string;?>
+         <span class="plus"></span><a href="<?php echo Utils::createLink('indicadorpdi', 'consultaindicador'); ?>">Consultar indicador</a>     
+    </div>
+<?php endif; ?>

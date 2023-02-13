@@ -1,0 +1,102 @@
+<?php
+
+class Calendario {
+
+    private $codigo;
+    private $unidade;
+    private $documento;
+    private $anogestao;
+    private $datainianalise;
+    private $datafimanalise;
+    private $datainianalisefinal;
+    private $datafimanalisefinal;
+  
+
+    public function __construct() {
+       
+    }
+    public function setCodigo($codigo) {
+        $this->codigo = $codigo;
+    }
+
+    public function getCodigo() {
+        return $this->codigo;
+    }
+
+
+   
+    public function setUnidade( $unidade) {
+        $this->unidade = $unidade;
+    }
+
+    public function getUnidade() {
+        return $this->unidade;
+    }
+
+    public function setDocumento( $documento) {
+        $this->documento = $documento;
+    }
+
+    public function getDocumento() {
+        return $this->documento;
+    }
+	
+    //Parcial
+    public function setDatainianalise($datainianalise) {
+        $this->datainianalise = $datainianalise;
+    }
+
+    public function getDatainianalise() {
+        return $this->datainianalise;
+    }
+
+    public function setDatafimanalise($datafimanalise) {
+        $this->datafimanalise = $datafimanalise;
+    }
+
+    public function getDatafimanalise() {
+        return $this->datafimanalise;
+    }
+    
+    //Final
+    public function setDatainianalisefinal($datainianalisefinal) {
+    	$this->datainianalisefinal = $datainianalisefinal;
+    }
+    
+    public function getDatainianalisefinal() {
+    	return $this->datainianalisefinal;
+    }
+    
+    public function setDatafimanalisefinal($datafimanalisefinal) {
+    	$this->datafimanalisefinal = $datafimanalisefinal;
+    }
+    
+    public function getDatafimanalisefinal() {
+    	return $this->datafimanalisefinal;
+    }
+    
+    
+    public function setAnogestao($anogestao) {
+        $this->anogestao = $anogestao;
+    }
+
+    public function getAnogestao() {
+        return $this->anogestao;
+    }
+      public function setMapa($mapa) {
+        $this->mapa = $mapa;
+    }
+
+    public function getMapa() {
+        return $this->mapa;
+    }
+
+
+  
+
+ 
+
+
+}
+
+?>

@@ -1,0 +1,184 @@
+<?php
+
+$sessao = $_SESSION['sessao'];
+$codunidade = $sessao->getCodUnidade(); // código da unidade
+$aplicacoes = $sessao->getAplicacoes(); // código das aplicações
+$anobase = $sessao->getAnobase();       // ano base
+$codestruturado = $sessao->getCodestruturado(); // código estruturado
+$codindicador=$_GET['ind'];
+?>
+<?php
+if (!$aplicacoes[38]) {
+    print "Erro ao acessar esta aplicação";
+    exit();
+}
+?>
+<?php
+
+
+$daounidade = new UnidadeDAO();
+$rows = $daounidade->buscasubunidades00($codestruturado);
+$unidade = array();
+$cont = 0;
+foreach ($rows as $row) {
+	$unidade[$cont] = new Unidade();
+	$unidade[$cont]->setCodunidade($row['CodUnidade']);
+	$unidade[$cont]->setNomeunidade($row['NomeUnidade']);
+	$cont++;
+}
+
+$daodoc = new DocumentoDAO();
+$objdoc = array();
+$cont1 = 0;
+for ($i = 0; $i < $cont; $i++) {
+	$daodoc = new DocumentoDAO();
+	$rows = $daodoc->buscadocumentoporunidade($unidade[$i]->getCodunidade());
+	foreach ($rows as $row) {
+		$objdoc[$cont1] = new Documento();
+		$objdoc[$cont1]->setCodigo($row['codigo']);
+		$objdoc[$cont1]->setNome($row['nome']);
+		$objdoc[$cont1]->setUnidade($unidade[$i]);
+		$objdoc[$cont1]->setAnoInicial($row['anoinicial']);
+		$objdoc[$cont1]->setAnoFinal($row['anofinal']);
+		$cont1++;
+	}
+}
+
+$daoind=new IndicadorDAO();
+$rows=$daoind->buscaindicador($codindicador);
+foreach ($rows as $r) {
+	$objind=new Indicador();
+    $objind = new Indicador();
+	$objind->setCodigo($r['Codigo']);		
+	$objind->setNome($r['nome']);
+	$objind->setCalculo($r['calculo']);
+}
+
+
+/*
+$daomapa = new MapaDAO();
+$daoobjetivo = new ObjetivoDAO();
+$objmapa = array();
+$objobjetivo = array();
+$cont2 = 0;
+for ($i = 0; $i < $cont1; $i++) {
+	$rows = $daomapa->buscamapadocumento($objdoc[$i]->getCodigo());
+	foreach ($rows as $row) {
+		$objmapa[$cont2] = new Mapa();
+		$objmapa[$cont2]->setCodigo($row['Codigo']);
+		$rowsobjetivo = $daoobjetivo->buscaobjetivo($row['codObjetivoPDI']);
+		foreach ($rowsobjetivo as $rowobjetivo)
+		{
+			$objobjetivo[$cont2] = new Objetivo();
+			$objobjetivo[$cont2]->setCodigo($rowobjetivo['Codigo']);
+			$objobjetivo[$cont2]->setObjetivo($rowobjetivo['Objetivo']);
+		}
+		$objmapa[$cont2]->setObjetivoPDI($objobjetivo[$cont2]);
+		$objmapa[$cont2]->setDocumento($objdoc[$i]);
+		$cont2++;
+	}
+}*/
+
+?>
+<head>
+	<div class="bs-example">
+		<ul class="breadcrumb">
+			<li class="active"><a href="<?php echo Utils::createLink('mapaestrategico', 'listamapapdu'); ?>">Painel Tático</a> >><a href="<?php echo Utils::createLink('indicadorpdi', 'consultaindicador'); ?>" >Indicadores vinculados</a>  >> <a href="<?php echo Utils::createLink('indicadorpdi', 'consultaindicadorproprio'); ?>" >Consulta Indicadores</a>  >>  <a href="#" >Editar indicador</a></li>  
+		</ul>
+	</div>
+</head>	
+<fieldset>
+    <legend>Cadastro de Indicadores</legend>
+    <form name="cad-indicador" method="POST" action="ajax/indicadorpdi/registraindicador.php" id="indicadores-cadastro">
+        <div id="resultado"></div>
+        
+        <table>
+        	<tbody>
+        	
+        		<tr>
+        			<td>
+			            <label>Indicador: </label>
+			        </td>
+			        <td>
+			        <input type=hidden name=codigo value="<?php echo $objind->getCodigo();?>">
+			        <input type=hidden name=acao value="<?php echo "E";?>">
+			        
+			        <textarea name="indicador" rows="1" cols="100"><?php  echo $objind->getNome();?></textarea>
+			         
+			        </td>
+		        </tr>		        
+				<tr> 
+		        	<td>   
+		            	<label>Fórmula de Cálculo: </label>
+		            </td>
+		            <td>						
+			            <textarea name="calculo" rows="5" cols="100"><?php  echo $objind->getCalculo();?></textarea>
+			        
+			        
+			        </td>
+		        </tr>				
+				
+				<?php if ($codunidade == "938"): ?>
+				
+				<tr>
+					<td>	
+						<label>Objeto de Mensuração: </label>
+					</td>
+					<td>
+						<textarea name="objeto" rows="5" cols="100"></textarea>					
+			        </td>
+		        </tr>      
+		                
+		        <tr> 
+		        	<td>   
+		            	<label>Unidade de Medida: </label>
+		            </td>
+		            <td>				
+			             <textarea name="unidadedemedida" rows="5" cols="100"></textarea>
+			        </td>
+		        </tr>
+		        
+		        <tr> 
+		        	<td>   
+		            	<label>Interpretação: </label>
+		            </td>
+		            <td>					
+			            <textarea name="interpretacao" rows="5" cols="100"></textarea>
+			        </td>
+		        </tr>
+		        
+		        <tr> 
+		        	<td>   
+		            	<label>Fonte/Método: </label>
+		            </td>
+		            <td>			
+			            <textarea name="metodo" rows="5" cols="100"></textarea>
+			        </td>
+		        </tr>
+		        
+		        <tr> 
+		        	<td>   
+		            	<label>Benchmarch: </label>
+		            </td>
+		            <td>
+			            <textarea name="benchmarch" rows="10" cols="100"></textarea>
+			        </td>
+		        </tr>
+		        
+		        <tr> 
+		        	<td>   
+		            	<label>Observações Adicionais: </label>
+		            </td>
+		            <td>	
+						<textarea name="observacoes" rows="10" cols="100"></textarea>
+			        </td>
+		        </tr>
+		      <?php endif; ?>      
+		</tbody>
+  </table>
+  <input type="button" value="Gravar" name="salvarindicador" class="btn btn-primary btn"/>	   
+   
+		    
+  </form>
+     
+</fieldset>

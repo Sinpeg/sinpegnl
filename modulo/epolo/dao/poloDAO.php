@@ -1,0 +1,95 @@
+<?php
+class poloDAO extends PDOConnectionFactory {
+	// ir� receber uma conex�o
+	private $conex = null;
+
+	// constructor
+	public function Acessibilidade_DAO(){
+		$this->conex = PDOConnectionFactory::getConnection();
+	}
+	
+
+	public function buscaep($codunidade, $anobase){
+		try{
+			$stmt = parent::prepare("SELECT * FROM `poloEstrutura` WHERE `codUnidade` =  :codunidade AND `ano` = :ano");
+			//print_r($stmt);
+			$stmt->execute(array(':codunidade'=>$codunidade,':ano'=>$anobase));
+			// retorna o resultado da query
+			return $stmt;
+
+		}catch ( PDOException $ex ){
+			$mensagem = urlencode($ex->getMessage());//para aceitar caracteres especiais
+			$cadeia="location:../saida/erro.php?codigo=".$ex->getCode()."&mensagem=".$mensagem;
+			header($cadeia);
+		}
+	}
+	
+	public function buscaepAdmin($anobase){
+	    try{
+	        $stmt = parent::prepare("SELECT * FROM `poloEstrutura` WHERE `ano` = :ano");
+	        //print_r($stmt);
+	        $stmt->execute(array(':ano'=>$anobase));
+	        // retorna o resultado da query
+	        return $stmt;
+	        
+	    }catch ( PDOException $ex ){
+	        $mensagem = urlencode($ex->getMessage());//para aceitar caracteres especiais
+	        $cadeia="location:../saida/erro.php?codigo=".$ex->getCode()."&mensagem=".$mensagem;
+	        header($cadeia);
+	    }
+	}
+
+	//Função que insere os dados da estrutura dos polos	
+	public function insere( $dados ){
+		try{
+			parent::beginTransaction();
+			
+			$sql="INSERT INTO `poloEstrutura` (`bandaLarga`,`videoConf`,`micros`,`coordenacao`,`salaTutor`,`codUnidade`,`ano`)  VALUES (?,?,?,?,?,?,?)";
+			$stmt = parent::prepare($sql);
+			$stmt->bindValue(1,$dados['qtdbanda']);
+			$stmt->bindValue(2,$dados['qtdvideo']);
+			$stmt->bindValue(3,$dados['qtdmicro']);
+			$stmt->bindValue(4,$dados['qtdsala']);
+			$stmt->bindValue(5,$dados['qtdsalatutores']);
+			$stmt->bindValue(6,$dados['codUnidade']);
+			$stmt->bindValue(7,$dados['anoBase']);
+			$stmt->execute();
+			
+			parent::commit();
+		}catch ( PDOException $ex ){
+			parent::rollback();
+			$mensagem = urlencode($ex->getMessage());//para aceitar caracteres especiais
+			$cadeia="location:../saida/erro.php?codigo=".$ex->getCode()."&mensagem=".$mensagem;
+			header($cadeia);
+		}
+
+	}
+
+	public function altera($dados){
+		try{
+			parent::beginTransaction();
+			$sql = "UPDATE `poloEstrutura` SET `bandaLarga`=?,`videoConf`=?,`micros`=?,`coordenacao`=?,`salaTutor`=? WHERE `codUnidade`=? AND `ano`=?";
+			$stmt = parent::prepare($sql);
+			$stmt->bindValue(1,$dados['qtdbanda']);
+			$stmt->bindValue(2,$dados['qtdvideo']);
+			$stmt->bindValue(3,$dados['qtdmicro']);
+			$stmt->bindValue(4,$dados['qtdsala']);
+			$stmt->bindValue(5,$dados['qtdsalatutores']);
+			$stmt->bindValue(6,$dados['codUnidade']);
+			$stmt->bindValue(7,$dados['anoBase']);
+			$stmt->execute();
+			
+			parent::commit();
+		}catch ( PDOException $ex ){
+			parent::rollback();
+			$mensagem = urlencode($ex->getMessage());//para aceitar caracteres especiais
+			$cadeia="location:../saida/erro.php?codigo=".$ex->getCode()."&mensagem=".$mensagem;
+			header($cadeia);
+		}
+	}	
+
+	public function fechar(){
+		PDOConnectionFactory::Close();
+	}
+}
+?>

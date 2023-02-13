@@ -1,0 +1,65 @@
+<?php
+//Exibir Erros
+ini_set('display_errors',1);
+ini_set('display_startup_erros',1);
+error_reporting(E_ALL);
+
+require_once '../../dao/PDOConnectionFactory.php';
+require_once '../../modulo/raa/dao/subtopicoDAO.php';
+
+$subtopico = new SubtopicoDAO();
+
+$op = $_POST["operacao"]; //Pode ser inclusão ou edição
+
+$topico = $_POST["topico"]; //Recebe o codigo do tópico
+$titulo = $_POST["titulo"]; //Recebe o título do subtopico
+$situacao = isset($_POST['situacao']) ? 1 : 0;
+
+if($_POST["codUnidade"] == 100000){
+	$tipo = "P";
+}else{
+	$tipo = "E";
+}
+
+$codUnidade = $_POST["codUnidade"];
+$anobase = $_POST["anobase"];
+
+	switch ($op){
+		case "I":
+			$rowqtd = $subtopico->countmesmotitulo($codUnidade, $titulo, $topico,$anobase);
+			foreach ($rowqtd as $row){
+				$mesmoTitulo = $row['qtd'];
+			}
+			//Busca a quantidade de subtopicos existentes
+			$qtdSub = $subtopico->countsubtopicos($codUnidade, $topico,$anobase);
+			foreach ($qtdSub as $row){
+				$ordemNovo = $row['qtd']+1;
+			}
+			
+			if($mesmoTitulo == 0){
+				$dados = array('ordem' => $ordemNovo, 'topico' => $topico, 'codUnidade' => $codUnidade, 'titulo' => $titulo, 'tipo' => $tipo, 'situacao' => $situacao, 'anoinicial' => date("Y"));
+				$subtopico->inseresubtopico($dados);
+				echo 1; //Execultado com sucesso
+			}else{
+				echo 0; //já existe um tópico com o mesmo título
+			}
+			break;
+		case "A":
+			$rowqtd = $raaDAO->countmesmotituloeditar($codUnidade, $titulo, $_POST['codTopico'],$anobase);
+			foreach ($rowqtd as $row){
+				$mesmoTitulo = $row['qtd'];
+			}
+			if($mesmoTitulo == 0){
+				$dados = array('codUnidade' => $codUnidade, 'titulo' => $titulo, 'tipo' => $tipo, 'situacao' => $situacao, 'codTopico' => $_POST['codTopico'], 'anofinal' => date("Y"));
+				$raaDAO->alteratopico($dados);
+				echo 1; //Execultado com sucesso
+			}else{
+				echo 0; //já existe um tópico com o mesmo título
+			}
+			break;
+	}	
+
+
+?>
+
+ 

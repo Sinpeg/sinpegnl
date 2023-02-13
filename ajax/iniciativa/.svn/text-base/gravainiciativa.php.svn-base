@@ -1,0 +1,101 @@
+<?php
+define('BASE_DIR', dirname(__FILE__));
+require_once(BASE_DIR . DIRECTORY_SEPARATOR . '../../dao/PDOConnectionFactory.php');
+require_once(BASE_DIR . DIRECTORY_SEPARATOR . '../../flash/Flash.php');
+require '../../modulo/iniciativa/classe/Iniciativa.php';
+require '../../classes/unidade.php';
+require '../../classes/Controlador.php';
+require '../../modulo/iniciativa/dao/IniciativaDAO.php';
+require_once '../../classes/sessao.php';
+require '../../util/Utils.php';
+
+
+
+session_start();
+$sessao = new Sessao();
+$sessao = $_SESSION['sessao'];
+$aplicacoes = $sessao->getAplicacoes();
+$codunidade = $sessao->getCodUnidade();
+//echo $codunidade."jskdfdskjfdsjfjgjg";die;
+$unidade = new Unidade();
+$unidade->setCodunidade($codunidade);
+$c=new Controlador();
+
+//var_dump($_POST);die;
+//echo var_dump($_POST)."<br>";
+//echo var_dump($_FILES)."<br>";
+
+if (!$aplicacoes[36] && !$aplicacoes[40]) {
+	print "Erro ao acessar esta aplicação";
+	exit();
+}
+
+$erro=NULL;
+ if ($_POST['nome']==""){
+	$erro = "Informe o nome!";
+}else if  ($_POST['finalidade']==""){
+	$erro = "Informe a finalidade!";
+}/*else if (!isset($_POST['coordenador'])) {
+	$erro="Informe o coordenador!";
+}*/
+if ($erro == NULL){ 
+
+    $nome= strip_tags($_POST['nome']); 
+    $finalidade=$_POST['finalidade'];
+
+    //verificar periodo se ja existe
+    $iniciativa = new Iniciativa();
+    $daoiniciativa = new IniciativaDAO();
+
+
+    $iniciativa->setNome($nome);
+    $iniciativa->setUnidade($unidade);
+    $iniciativa->setFinalidade($finalidade);
+ //   $iniciativa->setCoordenador($coordenador);*/
+   // echo $iniciativa->getUnidade()->getCodunidade()."-------";
+    $rows=$daoiniciativa->buscaPorNome($nome);
+    $codigo=0;
+	foreach ($rows as $r){
+        $codigo=$r['codIniciativa'];
+    }
+ //   echo "session".$_SESSION['idIniciativa']."-----------";
+    if ($codigo==0 && $_SESSION['idIniciativa']!=NULL){
+    	$codigo=$_SESSION['idIniciativa'];
+    }
+    
+	if ($codigo==0) {
+		$idIniciativa = $daoiniciativa->insere($iniciativa);
+		
+		$_SESSION['idIniciativa'] = $idIniciativa;
+		// echo $_SESSION['idIniciativa']."ini criado";
+		$string = "Iniciativa cadastrada com sucesso! Vincule os Indicadores referentes a iniciativa.";
+	} else if($codigo!=0) {
+		
+		$iniciativa->setCodIniciativa($codigo);
+		
+		$daoiniciativa->altera($iniciativa);
+		$_SESSION['idIniciativa']=NULL;
+		$string = "Iniciativa atualizada com sucesso! Agora, você pode vincular o indicador à iniciativa.";
+	}
+?>
+     <div id="success">
+        <img src="webroot/img/accepted.png" width="30" height="30"/><?php print $string; ?>
+    </div> 
+ <?php  
+    //  Flash::addFlash($string);
+  //    Utils::redirect('iniciativa', 'editaIniciativa');
+ 
+}else {?>
+
+    <div class="erro">
+        <img src="webroot/img/error.png" width="30" height="30"/>
+        <?php print $erro; ?>
+    </div> 
+  <?php    
+      //Flash::addFlash($erro);
+     
+     	//Utils::redirect('iniciativa', 'editaIniciativa');
+      
+     }
+ ?>
+

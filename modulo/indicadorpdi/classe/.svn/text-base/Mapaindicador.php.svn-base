@@ -1,0 +1,110 @@
+<?php 
+
+
+class Mapaindicador {
+
+    private $codigo;
+    private $indicador; 
+    private $mapa; // objeto da classe mapa
+    private $propindicador;
+    private $meta;
+    private $arraymeta;
+    
+    
+
+    public function __construct() {
+        
+    }
+
+    
+    public function setArraymeta($arraymeta){
+    	$this->arraymeta = $arraymeta;
+    }
+    
+    public function getArraymeta(){
+    	return $this->arraymeta;
+    }
+    
+    public function setCodigo($codigo) {
+        $this->codigo = $codigo;
+    }
+
+    public function getCodigo() {
+        return $this->codigo;
+    }
+    
+    public function setIndicador(Indicador $ind) {
+    	$this->indicador = $ind;
+    }
+    
+    public function getIndicador() {
+    	return $this->indicador;    }
+    
+    
+    public function setMapa(Mapa $mapa) {
+    	$this->mapa = $mapa;
+    }
+    
+    public function getMapa() {
+    	return $this->mapa;
+    }
+    
+    public function setPropindicador($propindicador) {
+    	$this->propindicador = $propindicador;
+    }
+    
+    public function getPropindicador() {
+    	return $this->propindicador;
+    }
+    
+    public function setMeta($meta) {
+    	$this->meta = $meta;
+    }
+    
+    public function getMeta() {
+    	return $this->meta;
+    }
+    
+   
+    
+    public function criaMeta($codigo,$periodo,$calendario,$meta1,$ano,$metrica,$cumulativo){
+    	$m = new Meta();
+    	
+    
+    	$m->setCodigo($codigo) ;
+    	$m->setPeriodo($periodo);
+    	$m->setMeta($meta1);
+    	$m->setAno($ano);
+    	$m->setMetrica($metrica);
+    	$m->setCumulativo($cumulativo);
+    	$m->setCalendario($calendario);
+    	
+    	$m->setMapaindicador($this);
+    	    	 
+    	 
+    	$this->meta=$m;
+    
+    }
+    public function adicionaItemMeta($codigo,$periodo,$calendario,$meta1,$ano,$metrica,$cumulativo,$indexArray){
+     $this->criaMeta($codigo,$periodo,$calendario,$meta1,$ano,$metrica,$cumulativo);
+     $this->arraymeta[$indexArray] = $this->meta;
+     
+    }
+    
+    
+
+
+        
+     public function criaIndicIniciativa($codigo,$iniciativa){
+        $m = new IndicIniciativa();
+        
+        $m->setCodigo($codigo);
+	    $m->setMapaindicador($this);
+	    $m->setIniciativa($iniciativa);
+
+        
+        $this->indicIniciativa=$m;
+
+     }
+   }
+?>

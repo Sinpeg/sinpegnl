@@ -1,0 +1,192 @@
+<?php
+$sessao = $_SESSION['sessao'];
+$coddoc= $_POST['coddoc']; // código do indicador
+$codindicador = $_POST['ind'];
+$codmapaindicador = $_POST['mapaind'];
+$codunidade = $sessao->getCodUnidade(); // código da unidade
+$nomeunidade = $sessao->getNomeUnidade();
+$aplicacoes = $sessao->getAplicacoes(); // código das aplicações
+$anobase = $sessao->getAnobase();       // ano base
+$codestruturado = $sessao->getCodestruturado(); // código estruturado
+
+if (!$aplicacoes[38]) {
+    print "Erro ao acessar esta aplicação";
+    exit();
+}
+
+$daoindicador = new IndicadorDAO();
+$daomapaind = new MapaIndicadorDAO();
+$arrayindicador = $daoindicador->buscaindicador($codindicador)->fetch();
+/*$rowsmapaind = $daomapaind->buscamapaporindicador($codindicador);
+foreach ($rowsmapaind as $rowmapaind) {
+	$objmapaind = new Mapaindicador();
+	$objmapaind->setCodigo($rowmapaind['codigo']);
+	$codmapaindicador = $objmapaind->getCodigo();
+}
+*/
+$_SESSION['codmapaindicador'] = $codmapaindicador ;
+$daodoc = new DocumentoDAO();
+$rows = $daodoc->buscadocumento($coddoc);
+
+$objdoc = new Documento();
+foreach ($rows as $row) {
+	$objdoc->setCodigo($row['codigo']);
+	$objdoc->setAnoFinal($row['anofinal']);
+	$objdoc->setAnoInicial($row['anoinicial']);
+}
+
+$daometa = new MetaDAO();
+$querymeta = $daometa->buscaMetaResultadoporCodMapaIndiOnly($codmapaindicador);
+$cont=0;
+$arraymeta=NULL;
+foreach ($querymeta as $meta){
+	$m=new Meta();
+	$m->setCodigo($meta['Codigo']);
+	$m->setAno($meta['ano']);
+	$m->setMeta($meta['meta']);
+	$m->setMetrica($meta['metrica']);
+	$cont++;
+	$arraymeta[$cont] = $m;
+	 
+}
+$origem=0;
+$rowsorigem=$daomapaind->origemDoIndicadorDaUnidadeEPDI($anobase,$codunidade);
+
+if ($rowsorigem->rowcount()>0){
+  $origem=1;
+}
+/*
+$passou=0;
+$rowsmi1=$daomapaind->buscaIndicadorVinculadoAoObjetivoIncluidoNoPDUporIndicador($anobase, $_POST['codobjpdi'], $codunidade,$codindicador);
+if ($rowsmi1->rowcount()>0){
+  $passou=1;
+}
+
+$c=new Controlador();
+if (($arraymeta==NULL) &&     
+    (!$c->getProfile($sessao->getGrupo())
+   ))
+{
+	//se grupo for 18  
+	       $arraymeta=array();
+		   $cont=0;
+		   foreach ($rowsmi1 as $o1){
+		   	    $cont++;
+			 	$arraymeta[$cont]=new Meta();
+			 	$mi=new Mapaindicador();$mi->setCodigo($codmapaindicador);
+			 	$arraymeta[$cont]->setMapaindicador($mi);
+			 	$c=new Calendario();$c->setCodigo($o1['codCalendario']);
+			 	$arraymeta[$cont]->setCalendario($c);
+	            $arraymeta[$cont]->setPeriodo($o1['periodo']);
+	            $arraymeta[$cont]->setMeta($o1['meta']);
+	            $arraymeta[$cont]->setAno($o1['ano']);
+	            $arraymeta[$cont]->setMetrica($o1['metrica']);
+	            $arraymeta[$cont]->setCumulativo(NULL); 
+	            
+		    }
+		 }
+
+*/
+?>	
+<script>
+  
+$(function() {
+    $('input[name=excluir-meta]').click(function() {
+            
+    	$('div#resultadoexibemeta').empty();
+		$('div#resultado').empty();
+		   $('#cadastra-meta22').find('input:text,  select').val('');
+        $.ajax({url: "ajax/metapdi/deletameta.php", type: 'POST', data:$('form[name=cadastra-meta]').serialize(), success: function(data) {
+                $('div#resultado').html(data);
+            }});
+    	
+    	});   
+	
+});
+
+
+    
+</script>
+<head>
+	<div class="bs-example">
+		<ul class="breadcrumb">
+			<li class="active"><a href="<?php echo Utils::createLink('mapaestrategico', 'listamapapdu'); ?>">Painel Tático</a> >> <a href="<?php echo Utils::createLink('indicadorpdi', 'consultaindicador'); ?>" >Indicadores Vinculados</a>  >>  <a href="#" >Editar meta</a></li>  
+		</ul>
+	</div>
+</head>	
+	<fieldset>
+	<legend>Editar Meta</legend>
+	 Indicador: <?php echo $arrayindicador['nome']; ?>
+	<form name="cadastra-meta" id="cadastra-meta22" method="POST" action="" id="meta-cadastro">			
+		 
+			<div id="resultado"></div> 			
+				
+				<input  type="hidden" name="codmapaind" value="<?php echo $codmapaindicador; ?>" >
+				<input  type="hidden" name="coddoc" value="<?php echo $coddoc; ?>" >
+				
+				<table id="tablesorter" class="tablesorter-dropbox">
+    <tfoot>
+        <tr>
+            <th colspan="7" class="ts-pager form-horizontal">
+                <button type="button" class="btn first"><i class="icon-step-backward glyphicon glyphicon-step-backward"></i></button>
+                <button type="button" class="btn prev"><i class="icon-arrow-left glyphicon glyphicon-backward"></i></button>
+                <span class="pagedisplay"></span> <!-- this can be any element, including an input -->
+                <button type="button" class="btn next"><i class="icon-arrow-right glyphicon glyphicon-forward"></i></button>
+                <button type="button" class="btn last"><i class="icon-step-forward glyphicon glyphicon-step-forward"></i></button>
+                <select class="pagesize input-mini" title="Select page size">
+                    <option selected="selected" value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                    <option value="40">40</option>
+                </select>
+                <select class="pagenum input-mini" title="Select page number"></select>
+            </th>
+        </tr>
+    </tfoot>
+        <thead>
+            <tr>
+                <th>Ano</th>
+                <th>Meta</th>
+                <th>Tipo</th>
+            </tr>
+        </thead>
+        <tbody>  
+        
+        <?php 
+        
+        for ($i=1;$i<=$cont;$i++) {
+          if ($arraymeta[$i]->getAno()<2021 || $arraymeta[$i]->getAno()>2024){
+        	?>
+                        
+                <tr>
+                    <td><?php echo $arraymeta[$i]->getAno();?>  
+                    
+                    <input name="codigo<?php echo $arraymeta[$i]->getAno(); ?>" type="hidden" value="<?php echo $arraymeta[$i]->getCodigo();?>"/>
+                    
+                    </td>
+                    <td><input value ="<?php echo  str_replace('.', ',', $arraymeta[$i]->getMeta());?>" data-mask="000000,00" data-mask-reverse="true" size=10 type="text" name="meta<?php echo $arraymeta[$i]->getAno();?>"/> </td>                  
+                     <td><select name="metrica<?php echo $arraymeta[$i]->getAno();?>" class="sel1">
+					    <option value="0">Selecione tipo de métrica...</option>
+					    <option value="P"<?php echo ($arraymeta[$i]->getMetrica()=='P')? "selected":""; ?>>Percentual</option>
+					    <option value="Q"<?php echo ($arraymeta[$i]->getMetrica()=='Q')? "selected":""; ?> >Absoluto</option>					    
+					    </select> </td>                
+                </tr>
+                <?php   } 
+        } ?>
+                        
+        </tbody>
+    </table>
+    <?php if ($origem==0){?>
+              <input type="button" value="Gravar" name="adicionar-meta" class="btn btn-primary"/>
+              <input type="button" value="Excluir" name="excluir-meta" class="btn btn-primary"/>
+              
+    <?php  } ?>		      
+		      <span class="plus"></span>
+		      <input type="hidden" name="action" value="A" />
+		      <input type="hidden" name="coleta" value="P" />		
+		      <input type="hidden" name="coddoc" value="<?php echo $coddoc; ?>">      
+    </form>
+    
+</fieldset>
+
+

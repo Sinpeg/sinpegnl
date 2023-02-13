@@ -1,0 +1,140 @@
+<?php
+class ResultadoDAO extends PDOConnectionFactory {
+
+    public $conex = null;
+/*
+    public function ResultadoDAO() {
+        $this->conex = PDOConnectionFactory::getConnection();
+    }
+*/
+    /**
+     * 
+     * @param Resultado $resultado
+     */
+    public function insere(Resultado $resultado) {
+        try {
+            $query = "INSERT INTO `resultados_pdi` (`CodMeta`, `meta_atingida`, `periodo`, `analiseCritica`,`acaoPdi`) VALUES (?,?,?,?,?)";
+            $stmt = parent::prepare($query);
+            parent::beginTransaction();
+            $stmt->bindValue(1, $resultado->getMeta()->getCodigo());
+            $stmt->bindValue(2, $resultado->getMetaAtingida());
+            $stmt->bindValue(3, $resultado->getPeriodo());
+            $stmt->bindValue(4, $resultado->getAnaliseCritica());
+            $stmt->bindValue(5, $resultado->getAcao());
+
+            $stmt->execute();
+            parent::commit();
+        } catch (PDOException $ex) {
+            parent::rollback();
+            print "Erro: insere:" . $ex->getCode() . "Mensagem" . $ex->getMessage();
+        }
+    }
+
+    /**
+     * 
+     * @param Resultado $resultado
+     */
+    public function altera(Resultado $resultado) {
+        try {
+            $stmt = parent::prepare("UPDATE `resultados_pdi` SET `CodMeta`=?, `meta_atingida`=?, `periodo`=?, `analiseCritica`=? , `acaoPdi`=?  WHERE `Codigo`=?");
+            parent::beginTransaction();
+            $stmt->bindValue(1, $resultado->getMeta()->getCodigo());
+            $stmt->bindValue(2, $resultado->getMetaAtingida());
+            $stmt->bindValue(3, $resultado->getPeriodo());
+            $stmt->bindValue(4, $resultado->getAnaliseCritica());
+            $stmt->bindValue(5, $resultado->getAcao());
+            $stmt->bindValue(6, $resultado->getCodigo());
+            $stmt->execute();
+            parent::commit();
+        } catch (PDOException $ex) {
+            print "Erro: altera " . $ex->getCode() . " " . $ex->getMessage();
+        }
+    }
+
+    /**
+     * 
+     * @param type $codigo
+     */
+    public function deleta($codigo) {
+        try {
+            parent::beginTransaction();
+            $stmt = parent::prepare("DELETE FROM `resultados_pdi` WHERE `Codigo`=?");
+            $stmt->bindValue(1, $codigo);
+            $stmt->execute();
+            parent::commit();
+        } catch (PDOException $ex) {
+            parent::rollback();
+            print "Erro: delete:" . $ex->getCode() . "Mensagem" . $ex->getMessage();
+        }
+    }
+
+    /**
+     * 
+     * @return type
+     */
+    public function lista() {
+        try {
+            $stmt = parent::query("SELECT * FROM `resultados_pdi`");
+            return $stmt;
+        } catch (PDOException $ex) {
+            echo "Erro lista: " . $ex->getMessage();
+        }
+    }
+
+    public function buscaresultadometa($codigo) {
+        try {
+            $sql = "SELECT * FROM `resultados_pdi` WHERE `CodMeta`= :codigo";
+            $stmt = parent::prepare($sql);
+            $stmt->execute(array(':codigo' => $codigo));
+            return $stmt;
+        } catch (PDOException $ex) {
+            echo "Erro buscaresultadometa: " . $ex->getMessage();
+        }
+    }
+
+    public function buscaresultado($codigo) {
+        try {
+            $sql = "SELECT * FROM `resultados_pdi` WHERE `Codigo`= :codigo";
+            $stmt = parent::prepare($sql);
+            $stmt->execute(array(':codigo' => $codigo));
+            return $stmt;
+        } catch (PDOException $ex) {
+            echo "Erro buscaresultado: " . $ex->getMessage();
+        }
+    }
+
+    public function buscaresultaperiodometa($codmeta, $periodo) {
+        try {
+            $sql = "SELECT * FROM `resultados_pdi` WHERE `periodo`= :periodo
+                AND `CodMeta` = :codmeta";
+            $stmt = parent::prepare($sql);
+            $stmt->execute(array(':periodo' => $periodo, ':codmeta' => $codmeta));
+            return $stmt;
+        } catch (PDOException $ex) {
+            echo "Erro buscaresultaperiodometa: " . $ex->getMessage();
+        }
+    }
+
+    public function buscaresultadometa1($codmeta, $periodo) {
+        try {
+            $sql = "SELECT * FROM `resultados_pdi` WHERE `CodMeta`= :codigo
+                AND `periodo`= :periodo";
+            $stmt = parent::prepare($sql);
+            $stmt->execute(array(':periodo' => $periodo, ':codigo' => $codmeta));
+            return $stmt;
+        } catch (PDOException $ex) {
+            echo "Erro buscaresultadometa1: " . $ex->getMessage();
+        }
+    }
+
+    
+    /**
+     * 
+     */
+    public function fechar() {
+        PDOConnectionFactory::Close();
+    }
+
+}
+
+?>

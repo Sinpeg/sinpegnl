@@ -1,0 +1,206 @@
+<?php
+$sessao = $_SESSION['sessao'];
+$codmeta = $_GET['codmeta']; // código do indicador
+$aplicacoes = $sessao->getAplicacoes();
+$anobase = $sessao->getAnobase();
+$codunidade = $sessao->getCodUnidade();
+?>
+<?php
+if (!$aplicacoes[39]) {
+    print "Erro ao acessar esta aplicação";
+    exit();
+}
+?>
+<?php
+//$anobase = $sessao->getAnobase();
+//$codunidade = $sessao->getCodUnidade();
+$unidade = new Unidade();
+$unidade->setCodunidade($codunidade);
+//
+$daodoc = new DocumentoDAO();
+ $c=new Controlador();
+    if ($c->getProfile($sessao->getGrupo())) {//se grupo for 18  
+      $rowsdoc = $daodoc->buscadocumentoPrazo($sessao->getAnobase());
+    }else{
+      $rowsdoc = $daodoc->buscaporRedundancia($codunidade,$sessao->getAnobase());
+    }
+    
+    
+$objdoc = array();
+$cont = 0;
+//
+foreach ($rowdoc as $row) {
+    $objdoc[$cont] = new Documento();
+    $objdoc[$cont]->setUnidade($unidade);
+    $objdoc[$cont]->setCodigo($row['codigo']);
+    $objdoc[$cont]->setNome($row['nome']);
+    $objdoc[$cont]->setAnoInicial($row['anoinicial']);
+    $objdoc[$cont]->setAnoFinal($row['anofinal']);
+    $cont++;
+}
+$daomapa = new MapaDAO();
+$objmapa = array();
+$cont1 = 0;
+for ($i = 0; $i < $cont; $i++) {
+    $rows = $daomapa->buscamapadocumento($objdoc[$i]->getCodigo());
+    foreach ($rows as $row) {
+        $objmapa[$cont1] = new Mapa();
+        $objmapa[$cont1]->setCodigo($row['Codigo']);
+        $objmapa[$cont1]->setObjetivo($row['Objetivo']);
+        $objmapa[$cont1]->setDocumento($objdoc[$i]);
+        $cont1++;
+    }
+}
+$daoind = new IndicadorDAO();
+$objind = array();
+$cont2 = 0;
+for ($i = 0; $i < $cont1; $i++) {
+    $rows = $daoind->buscaindicadorpormapa2($objmapa[$i]->getCodigo());
+    foreach ($rows as $row) {
+        $unidades_pdi = array(945, 948, 949, 950, 951, 952, 953, 954, 957, 962, 964,
+            966, 2504);
+        if ($row['PropIndicador'] == $codunidade || in_array($codunidade, $unidades_pdi)) {
+            $objind[$cont2] = new Indicador();
+            $objind[$cont2]->setMapa($objmapa[$i]);
+            $objind[$cont2]->setCodigo($row['Codigo']);
+            $objind[$cont2]->setIndicador($row['indicador']);
+            $cont2++;
+        }
+    }
+}
+$daometa = new MetaDAO();
+$objmeta = new Meta();
+
+for ($i = 0; $i < $cont2; $i++) {
+    for ($i = 0; $i < $cont2; $i++) {
+        $rows = $daometa->buscarmetaindicador($objind[$i]->getCodigo());
+        foreach ($rows as $row) {
+            if ($row['CodigoIndicador'] == $objind[$i]->getCodigo() && $row['ano'] == $anobase && $row['Codigo'] == $codmeta) {
+                $objmeta->setCodigo($row['Codigo']);
+                $objmeta->setMeta($row['meta']);
+                $objmeta->setAno($anobase);
+                $objmeta->setMetrica($row['metrica']);
+                $objmeta->setCumulativo($row['cumulativo']);
+                $objmeta->setIndicador($objind[$i]);
+                $objmeta->setPeriodo($row['periodo']);
+                $objmeta->setCumulativo($row['cumulativo']);
+            }
+        }
+    }
+}
+?>
+<form name="adicionar" method="POST" action="ajax/metapdi/alterameta.php">
+    <fieldset>
+        <div id="resultado">
+        </div>
+        <legend>Atualizar Meta</legend>
+        <div>
+            <label>Documento:</label>
+            <select name="documento" id="documento" class="sel1">
+                <option value="0">Selecione o documento...</option>
+                <?php
+                $nomedoc = 'default';
+                for ($i = 0; $i < $cont2; $i++) {
+                    if ($objind[$i]->getMapa()->getDocumento()->getNome() != $nomedoc) {
+                        $nomedoc = $objind[$i]->getMapa()->getDocumento()->getNome();
+                        ?> 
+                        <?php if ($objind[$i]->getMapa()->getDocumento()->getNome() == $objmeta->getIndicador()->getMapa()->getDocumento()->getNome()) { ?>
+                            <option value="<?php print $objind[$i]->getMapa()->getDocumento()->getCodigo(); ?>" selected><?php print $nomedoc; ?></option>
+                        <?php } else { ?>           
+                            <option value="<?php print $objind[$i]->getMapa()->getDocumento()->getCodigo(); ?>"><?php print $nomedoc; ?></option>
+                        <?php } ?>
+                    <?php } ?>
+                <?php } ?>
+            </select>
+        </div>
+        <div class="objetivo">
+            <label>Objetivo:</label>
+            <select class="sel1" name="objetivo"> 
+                <?php $nomeobj = 'default'; ?>
+                <option value="0">Selecione um objetivo...</option>
+                <?php for ($i = 0; $i < $cont2; $i++) { ?>
+                    <?php if ($objind[$i]->getMapa()->getObjetivo() != $nomeobj): $nomeobj = $objind[$i]->getMapa()->getObjetivo() ?>
+                        <option value="<?php print $objind[$i]->getMapa()->getCodigo(); ?>" <?php
+                        if ($objmeta->getIndicador()->getMapa()->getCodigo() == $objind[$i]->getMapa()->getCodigo()) {
+                            print "selected";
+                        }
+                        ?>><?php print ($nomeobj); ?></option>
+                            <?php endif; ?>
+                        <?php } ?>
+            </select>
+        </div>
+        <div class="indicador">
+            <label>Indicador:</label>
+            <select class="sel1" name="indicador">
+                <option value="0">Selecione um indicador...</option>
+                <?php
+                $daoind = new IndicadorDAO();
+                $rows = $daoind->buscaindicadorpormapa2($objmeta->getIndicador()->getMapa()->getCodigo());
+                ?>
+                <?php foreach ($rows as $row) { ?>
+                    <option value="<?php print $row['Codigo']; ?>" <?php
+                    if ($row['Codigo'] == $objmeta->getIndicador()->getCodigo()) {
+                        print "selected";
+                    }
+                    ?>><?php print $row['indicador']; ?></option>
+<?php } ?>
+            </select>
+        </div>
+        <div>
+            <label>Meta:</label>
+            <input type="text" class="short" name="meta" value="<?php print str_replace('.', ',', $objmeta->getMeta()); ?>"/>
+        </div>
+        <div>
+            <label>Período de coleta: </label>
+            <span class="intermediario"><input type="radio" value="M" name="coleta" <?php
+                if ($objmeta->getPeriodo() == "M") {
+                    print "checked";
+                }
+                ?>/>Mensal</span>
+            <span class="intermediario"><input type="radio" value="T" name="coleta" <?php
+                if ($objmeta->getPeriodo() == "T") {
+                    print "checked";
+                }
+                ?>/>Trimestral</span>
+            <span class="intermediario"><input type="radio" value="S" name="coleta" <?php
+                if ($objmeta->getPeriodo() == "S") {
+                    print "checked";
+                }
+                ?>/>Semestral</span>
+            <span class="intermediario"><input type="radio" value="A" name="coleta" <?php
+                if ($objmeta->getPeriodo() == "A") {
+                    print "checked";
+                }
+                ?>/>Anual</span>
+        </div>
+        <div>
+            <span class="intermediario">Métrica:</span>
+            <span class="intermediario"><input type="radio" value="p" name="metrica" <?php
+                if ($objmeta->getMetrica() == "P") {
+                    print "checked";
+                }
+                ?> />Percentual</span>
+            <span class="intermediario"><input type="radio" value="q" name="metrica" <?php
+                if ($objmeta->getMetrica() == "Q") {
+                    print "checked";
+                }
+                ?> />Quantitativo</span>
+        </div>
+        <div>
+            <span class="intermediario">Marque se o resultado para esta meta é cumulativo:</span>
+            <input type="checkbox" name="tipometa" <?php
+            if ($objmeta->getCumulativo() == '1') {
+                print 'checked';
+            }
+            ?>/>
+        </div>
+        <div>
+            <input type="button" value="Atualizar" name="salvar" class="btn btn-primary" />
+        </div>
+        <input type="hidden" name ="action" value="U"/>
+        <input type="hidden" name="codindic" value="<?php print $objmeta->getIndicador()->getCodigo(); ?>" />
+    </fieldset>
+</form>
+<div>
+    <a class="voltar" href="<?php echo Utils::createLink('metapdi', 'listameta');?>"><img src="webroot/img/back.png" style="vertical-align: middle;"/>Listar metas</a>
+</div>

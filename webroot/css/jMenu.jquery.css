@@ -1,0 +1,81 @@
+.fNiv {
+	border-right: 1px solid #4E6CB4;
+}
+
+#jMenu {
+	display: table;
+	margin: 0;
+	padding: 0;
+}
+
+/********************/
+/** premier niveau **/
+/********************/
+#jMenu li {
+	display: table-cell;
+	background-color: #7596ED;
+	margin: 0;
+	/*float:left;*/
+}
+
+#jMenu li a {
+	text-decoration:none; /* adicionado */
+	padding: 10px;		
+	display: block;
+	background-color: transparent;
+	color: #fff;
+	/*	text-transform:uppercase; */ /*modificado*/
+	cursor: pointer;
+	font-size: 13px;
+	font-family: arial;
+}
+
+/*******************/
+/** second niveau **/
+/*******************/
+#jMenu li ul {
+	display: none;
+	position: absolute;
+	padding: 0;
+	margin
+	:
+	0;
+	z-index: 250; /* adicionado */
+}
+
+#jMenu li ul li {
+	background-color: #7596ED;
+	display: block;
+	border-bottom: 1px solid #4E6CB4;
+	padding: 0;
+}
+
+#jMenu li ul li.arrow {
+	border-top: 1px solid #4E6CB4;
+	background: #7596ED url('../img/arrow_down.png') no-repeat center
+		center;
+	height: 6px;
+	padding: 0;
+	border-bottom: none;
+	padding-bottom: 10px
+}
+
+#jMenu li ul li a {
+	font-size: 11px;
+	text-transform: none;
+	padding: 7px;
+	display: block;
+	border-top: 1px solid transparent;
+	border-bottom: 1px solid transparent;
+}
+
+#jMenu li ul li a.isParent {
+	background: #4E6CB4 url('../img/arrow_right.png') no-repeat right
+		center;
+}
+
+#jMenu li ul li a:hover {
+	background-color: #4E6CB4;
+	border-top: 1px solid #7596ED;
+	border-bottom: 1px solid #7596ED;
+}

@@ -1,0 +1,354 @@
+<?php
+//set_include_path(';../../includes');
+//require_once('../../includes/classes/sessao.php');
+//session_start();
+$sessao = $_SESSION["sessao"];
+
+  $anobase = $sessao->getAnobase();
+ //unidade do usuario
+  $unidade = new Unidade();
+  $unidade->setCodunidade($sessao->getCodunidade());
+  $unidade->setNomeunidade($sessao->getNomeunidade());
+  $aplicacoes = $sessao->getAplicacoes();
+  $codunidadesel=0;
+ require_once('classes/Calendario.php');
+ require_once('dao/CalendarioDAO.php');
+ $daocal = new CalendarioDAO();
+if (!$aplicacoes[38]) {
+    header("Location:index.php");
+}  else {
+   $codcalend=0;
+    if (!is_null($sessao->getCodunidsel())){
+       $codunidadesel=$sessao->getCodunidsel();
+       $unidade = new Unidade();
+       $unidade->setCodunidade($sessao->getCodunidsel());
+       $unidade->setNomeunidade($sessao->getNomeunidsel());
+       if (!empty($_GET["codcalend"])){
+          $codcalend=$_GET["codcalend"];
+       }
+       $rowcals=$daocal->buscaCalendarioporCod($codcalend);
+    }
+//ATENCAO, objeto unidade trocado para unidade selecionada
+ 
+ 
+   
+    require_once('modulo/documentopdi/classe/Documento.php');
+    require_once('modulo/documentopdi/dao/DocumentoDAO.php');
+   
+    $cont = 0;
+    $lista = array();
+    $daodoc = new DocumentoDAO();
+	$rowsdoc = $daodoc->buscadocumentoporunidadePeriodo($unidade->getCodunidade(),$anobase);
+    // busca documentos da unidade selecionada ou da unidade do usuário
+    foreach ($rowsdoc as $row) {
+        $cont++;
+        $lista[$cont] = new Documento();
+        $lista[$cont]->setCodigo($row['codigo']);
+        $lista[$cont]->setNome($row['nome']);
+        $lista[$cont]->setAnoinicial($row['anoinicial']);
+        $lista[$cont]->setAnofinal($row['anofinal']);
+    }//for
+      
+                 $cont1=0;$codcalend=0;    
+                 if (isset($_GET["codcalend"])){
+                    $codcalend=$_GET["codcalend"];
+                    $rowcals=$daocal->buscaCalendarioporCod($codcalend);
+                 }
+
+                 $contindice=0;
+                   if ($codcalend!=0){
+                     foreach ($lista as $l) {
+                       $cont1++;
+                       foreach ($rowcals as $row) {         
+                          if ($l->getCodigo()==$row['codDocumento']){
+                            $l->criaCalendario($row['codCalendario'],$unidade,$row['dataIniAnalise'],$row['dataFimAnalise'],$row['datainiAnaliseFinal'],$row['datafimAnaliseFinal'],$row['anoGestao']);
+                            $c=$l->getCalendario();
+                            $c->setDatainianalise(substr($row['dataIniAnalise'],8,2)."/".substr($row['dataIniAnalise'],5,2)."/".substr($row['dataIniAnalise'],0,4));
+                            $c->setDatafimanalise(substr($row['dataFimAnalise'],8,2)."/".substr($row['dataFimAnalise'],5,2)."/".substr($row['dataFimAnalise'],0,4));
+                            $c->setDatainianalisefinal(substr($row['datainiAnaliseFinal'],8,2)."/".substr($row['datainiAnaliseFinal'],5,2)."/".substr($row['datainiAnaliseFinal'],0,4));
+                            $c->setDatafimanalisefinal(substr($row['datafimAnaliseFinal'],8,2)."/".substr($row['datafimAnaliseFinal'],5,2)."/".substr($row['datafimAnaliseFinal'],0,4));
+                          }
+                       }
+                     }
+                  }
+    }
+    
+if   ($cont==0) {    
+     $c=new Calendario();
+     $d= new Documento();
+     Flash::addFlash("É necessário registrar o documento antes de inserir um calendário!!");
+}
+
+//   ob_end_flush();
+
+?>
+<head>
+    <script type="text/javascript">
+    function validarData() {
+
+    	DAY = 1000 * 60 * 60  * 24
+
+		//Parcial/////////////////////////////////////////////////////////
+    	data1 =  $("#calendario1").prop("value");
+    	data2 =  $("#calendario2").prop("value");
+			
+    	var nova1 = data1.toString().split('/');
+    	Nova1 = nova1[1]+"/"+nova1[0]+"/"+nova1[2];
+    	var nova2 = data2.toString().split('/');
+    	Nova2 = nova2[1]+"/"+nova2[0]+"/"+nova2[2];
+
+    	d1 = new Date(Nova1);
+    	d2 = new Date(Nova2);
+
+    	days_passed = Math.round((d2.getTime() - d1.getTime()) / DAY);
+
+		//Final//////////////////////////////////////////////////////////
+		data3 =  $("#calendario3").prop("value");
+    	data4 =  $("#calendario4").prop("value");
+			
+    	var nova3 = data3.toString().split('/');
+    	Nova3 = nova3[1]+"/"+nova3[0]+"/"+nova3[2];
+    	var nova4 = data4.toString().split('/');
+    	Nova4 = nova4[1]+"/"+nova4[0]+"/"+nova4[2];
+
+    	d3 = new Date(Nova3);
+    	d4 = new Date(Nova4);
+
+    	days_passed2 = Math.round((d4.getTime() - d3.getTime()) / DAY);
+
+    	// Período parcial inferior ao final 
+    	if (days_passed<0 || days_passed2<0){
+    		$("#alerta").html("");       	  
+      	    $("#alerta").append("<div class='alert alert-warning'><strong>Data final</strong>  deve ser posterior à data inicial!</div>");
+           // document.getElementById('msg').innerHTML = "Data final deve ser posterior à data inicial!";
+            return false;
+    	}		
+		
+    	if (Nova2 >= Nova3){
+    		$("#alerta").html("");       	  
+      	    $("#alerta").append("<div class='alert alert-warning'><strong>O período para lançar resultados parciais deve ser inferior ao período dos resultados finais!</strong></div>");
+           // document.getElementById('msg').innerHTML = "Data final deve ser posterior à data inicial!";
+            return false;
+    	}else{
+            document.getElementById('msg').innerHTML = " ";
+            return true;
+    	}
+
+    	
+    	}
+	
+    $(function() {
+        $( "#calendario1" ).datepicker({
+        	    dateFormat: 'dd/mm/yy',
+        	    dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+        	    dayNamesMin: ['D','S','T','Q','Q','S','S','D'],
+        	    dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],
+        	    monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+        	    monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+        	    nextText: 'Próximo',
+        	    prevText: 'Anterior',
+        	    minDate: new Date()  	    
+        });
+        $( "#calendario2" ).datepicker({
+    	    dateFormat: 'dd/mm/yy',
+    	    dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+    	    dayNamesMin: ['D','S','T','Q','Q','S','S','D'],
+    	    dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],
+    	    monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+    	    monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+    	    nextText: 'Próximo',
+    	    prevText: 'Anterior',
+    	    minDate: new Date()
+   		 }); 
+        $( "#calendario3" ).datepicker({
+    	    dateFormat: 'dd/mm/yy',
+    	    dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+    	    dayNamesMin: ['D','S','T','Q','Q','S','S','D'],
+    	    dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],
+    	    monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+    	    monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+    	    nextText: 'Próximo',
+    	    prevText: 'Anterior',
+    	    minDate: new Date()  	    
+    	});
+        $( "#calendario4" ).datepicker({
+    	    dateFormat: 'dd/mm/yy',
+    	    dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+    	    dayNamesMin: ['D','S','T','Q','Q','S','S','D'],
+    	    dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],
+    	    monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+    	    monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+    	    nextText: 'Próximo',
+    	    prevText: 'Anterior',
+    	    minDate: new Date()  	    
+  		  }); 
+
+        $("#ea").submit(function() {
+      	  // var ano = $("#anogestao").val();•••••
+            
+            
+          if ($("#documento-painel").val()=="0")  { 
+        	  $("#alerta").html("");       	  
+        	  $("#alerta").append("<div class='alert alert-warning'><strong>Plano de Desenvolvimento</strong> é obrigatório!</div>");
+      		  //$("#msg").text("Plano de Desenvolvimento é obrigatório!"); 
+      	      return false;
+      	  }    
+            
+      	  if ($("#anogestao").val()=="")  {
+      		  $("#alerta").html("");
+      		  $("#alerta").append("<div class='alert alert-warning'><strong>Ano de gestão</strong>  é obrigatório!</div>");
+      		  //$("#msg").text("Ano de gestão é obrigatório!"); 
+      	      return false;
+      	  }
+      	  if  ($("#calendario1").val()==""){
+      		$("#alerta").html("");
+      		  	$("#alerta").append("<div class='alert alert-warning'><strong>Data inicial</strong>  é obrigatório!</div>");
+      		 // $("#msg").text("Data inicial é obrigatória!"); 
+      	      return false;
+      	  }
+          if ($("#calendario2").val()=="") {
+        	   $("#alerta").html("");
+        	   $("#alerta").append("<div class='alert alert-warning'><strong>Data final</strong>  é obrigatório!</div>");
+		       //$("#msg").text("Data final é obrigatória!"); 
+	           return false;
+	      }
+          var ano =$("#anogestao").val();
+	         
+	      if (isNaN(parseInt(ano))){
+	    	  	$("#alerta").html("");
+       	   		$("#alerta").append("<div class='alert alert-warning'><strong>Ano de gestão</strong>  deve ser um número com 4 dígitos!</div>");
+	        	//$("#msg").text("Ano de gestão deve ser um número com 4 dígitos!"); 
+	        	 return false;
+	      }
+
+	      if (!validarData()){
+		      return false;
+	      }
+	          
+	      var dados;
+	        dados = $("#ea").serialize();
+	        // alert(dados);
+	        $.ajax({
+	            type:'POST',
+	            url:$("#ea").attr("action"),
+	            data: dados,
+	            success: function(response) {
+	                var token;
+	                var target;
+	                var resp;
+	                // parser
+	                token = response.charAt(0); // analise do token na resposta
+	                target = (token=="%")?("#error"):("#msg"); // o alvo para a resposta
+	                resp = (target=="#error")?(response.substr(1,(response.length-1))):(response);			
+	                //$(target).html("Operação realizada com sucesso!");
+	                $("#alerta").html("");
+	         	    $("#alerta").append("<div class='alert alert-success'><strong>Operação realizada com sucesso!</strong></div>");
+	            // fim do parser
+	            }
+	        });
+		
+		return false;
+
+
+
+	          
+	          /*
+	        var ano =$("#anogestao").val();
+	          var ano1 =$("#anoinicial").val();
+	          var ano2 =$("#anofinal").val();
+	          
+	          if (isNaN(parseInt(ano))){
+	        	 $("#msg").text("Ano de gestão deve ser um número com 4 dígitos!"); 
+	        	 return false;    
+
+	          }
+	        if ((ano<ano1) && (ano>ano2)){
+	        	 $("#msg").text("Ano de gestão deve estar entre "+ano1+" e "+ ano2+"!"); 
+	        	 return false; 
+	          } 
+	          */
+      	});
+  });
+
+
+    </script>
+    
+
+</head>
+
+<form name="inscalend" id="ea" method="post" action="index.php?modulo=calendarioPdi&acao=opCalend">
+	<div class="bs-example">
+		<ul class="breadcrumb">
+        <?php if (!is_null($sessao->getCodunidsel())){  ?> 
+	<!--	    <li><a href="<?php //echo Utils::createLink("usuario", "consultaunidade",array('codigo'=>50)); ?>">Consulta </a></li> -->
+       <?php } ?>
+            <li><a href="<?php echo Utils::createLink("calendarioPdi", "listaCalendario"); ?>">Lista calendários </a></li>
+			<li class="active">Inserir calendário</li>
+		</ul>
+	</div>
+	
+	<!-- ALERTAS-->
+	<div id="alerta"> </div>
+	
+    <h3>Inserir Calendário</h3><br/>
+    <div class="msg" id="msg"> </div>
+    <div>
+      <input name="codCalendario"  type="hidden"/>
+   	        
+      <?php if (!is_null($sessao->getCodunidsel())) {?>
+      <label>Unidade selecionada: </label><?php echo $unidade->getNomeunidade();?>
+      <?php } ?>
+    </div>
+    
+    <table>
+    <tr>    
+      <td><label>Plano de Desenvolvimento: </label></td>
+      <td> <select name="codDocumento" id="documento-painel" class="sel1">
+                <option value="0">Selecione o documento...</option>
+                <?php foreach ($lista as $d) : 
+                      if ($codcalend!=0 && $c->getDocumento()->getCodigo()==$d->getCodigo()) {?>
+                  	  	<option selected value="<?php print $d->getCodigo(); ?>"><?php print $d->getNome().'-'. $d->getAnoinicial(). ' a ' . 
+                        $d->getAnofinal() ; ?>
+                        </option>
+                       <?php } else { ?>
+                        <option  value="<?php print $d->getCodigo(); ?>"><?php print $d->getNome().'-'. $d->getAnoinicial(). ' a ' . 
+                        $d->getAnofinal() ; ?></option>
+                        <?php }  ?>
+                <?php endforeach; ?>
+            </select>
+       </td>  
+     </tr>       
+     <tr>
+       <td><label>Ano da gestão: </label></td>
+       <td><input placeholder="Ano" name="anogestao" id="anogestao" type="text" maxlength="4" size="4" value="<?php print $codcalend!=0?$c->getAnogestao():"";?>"/></td>
+     </tr>
+     <tr>
+       <td>
+          <label>Período para lançar resultados parciais:</label>
+                    
+       </td>      
+	    <td><input placeholder="Data Inicial" type="text" id="calendario1" name="calendario1" 
+                                          class="short"  maxlength="10" size="10"
+                                         value="<?php print $codcalend!=0?$c->getDatainianalise():"";?>" /> 	
+	    
+	        <input placeholder="Data Final" type="text" id="calendario2" name="calendario2"   class="short"  maxlength="10" size="10" onchange="validarData()"  value="<?php print $codcalend!=0?$c->getDatafimanalise():"";?>" /></td>
+	</tr>
+	<tr>
+	<td> <label>Período para lançar resultados finais:</label></td>
+	<td>
+		<input placeholder="Data Inicial" type="text" id="calendario3" name="calendario3"
+													 class="short"  maxlength="10" size="10" 
+													 value="<?php print $codcalend!=0?$c->getDatainianalisefinal():"";?>"/>
+		<input placeholder="Data Final" type="text" id="calendario4" name="calendario4"
+													 class="short"  maxlength="10" size="10" 
+													 value="<?php print $codcalend!=0?$c->getDatafimanalisefinal():"";?>"/>
+	</td>
+	</tr>
+	
+	</table> <br/>
+   <input name="op" type="hidden" value="I" />
+<?php if ($cont>0){ ?>
+  <input type="submit"  value="Gravar" class="btn btn-primary" id="gravar"  /></br></br>
+ <?php } ?>
+   
+</form>

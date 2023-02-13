@@ -1,0 +1,257 @@
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.container {
+  padding: 1px 0;
+  height: 100%;
+  width: 100%;
+  background-image: url("../img/planejamento-de-vendas-2.jpg");
+  background-size: 100% 100%;
+  color: #fff;
+  font-family: "Comfortaa", "Helvetica", sans-serif;
+}
+
+.text{
+	position: absolute;
+	max-width: 800px;
+	text-align: justify;
+	margin: 9% 0px 0px 16%;
+ 	/*background-color: #FFFFFF;*/
+ 	font-size: 19px;
+ 	color: black;
+}
+
+.food{
+	position: absolute;
+	max-width: 900px;
+	text-align: justify;
+	margin-top: -30px;
+ 	/*background-color: #FFFFFF;*/
+ 	font-size: 12px;
+ 	color: white;
+ 	margin-left: 5px; 			
+}
+
+.login {
+  max-width: 280px;
+  height: 100%;
+  margin: 0px 0px 0px auto;
+  background-color: #1c8a5c /*rgba(10,10,10,.68)*/;
+}
+
+.login-icon-field {
+  height: 12%;
+  width: 100%;
+  /*background-color: red;*/
+}
+
+.login-icon {
+  margin: 40px 2%;
+}
+
+.login-form {
+  padding: 8px 20px 20px;
+  height: 120px;
+  width: 100%;
+  
+  /*background-color: green;*/
+}
+
+.row {
+  /*display: none;*/
+}
+
+.username-row {
+  position: relative;
+  height: 40px;
+  /*background-color: pink;*/
+  border-bottom: 1px solid;
+  margin-bottom: 10px;
+}
+
+.password-row {
+  position: relative;
+  height: 40px;
+ /* background-color: grey;*/
+  border-bottom: 1px solid;
+}
+
+.password-icon,
+.user-icon {
+  margin: 5px;
+}
+
+.password-icon .key-path,
+.user-icon .user-path{
+  fill: rgba(10,10,10,0);
+  stroke: #fff;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-miterlimit: 10;
+  stroke-dasharray: 300;
+  stroke-dashoffset: 300;
+  -webkit-animation: dash 3s .3s linear forwards;
+  animation: dash 3s .3s linear forwards;
+}
+
+.user-icon .user-path {
+  -webkit-animation: dash 3s .8s linear forwards;
+  animation: dash 3s .8s linear forwards;
+}
+
+input {
+  position: absolute;
+  width: 195px;
+  height: 30px;
+  margin: 5px 0;
+  background: transparent;
+  border: none;
+  color: #FFFFFF;
+}
+
+input:focus,
+button:focus {
+  outline: none;
+}
+
+input::-webkit-input-placeholder {
+  color: #FFFFFF/*rgba(255,255,255,.4)*/;
+}
+
+input::-moz-placeholder {
+  color: #FFFFFF/*rgba(255,255,255,.4)*/;
+}
+
+.call-to-action {
+  margin: 22px 0;
+  height: 130px;
+  width: 100%;
+  /*background-color: blue;*/
+}
+
+button {
+  display: block;
+  width: 240px;
+  height: 40px;
+  padding: 0;
+  margin: 10px 20px 10px;
+  font-weight: 700;
+  color: #fff;
+  background-color: #1c6f4c/*#0081C6*/;
+  border: none;
+  border-radius: 20px;
+  transition: background-color .10s ease-in-out;
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  user-select:none;
+}
+
+button:hover {
+  background-color: #DCDCDC;
+}
+
+button:active {
+  background-color: #0081C6;
+}
+
+p {
+  display: inline-block;
+  width: 200px;
+  margin: 0 40px;
+  font-size: .8rem;
+  color: rgba(255,255,255,.4);
+  /*background-color: yellow;*/
+}
+
+p a {
+  color: #fff;
+}
+
+label,
+p a:hover {
+  -webkit-cursor: pointer;
+  cursor: pointer;
+}
+
+@-webkit-keyframes dash {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+
+ /* Dropdown Button */
+.dropbtn {
+  /*background-color: #667788;*/
+  color: white;
+  padding: 10px;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+}
+
+/* Dropdown button on hover & focus */
+.dropbtn2:hover, .dropbtn:focus {
+  background-color: #667788;
+}
+
+a:link
+{
+text-decoration:none;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+  position: absolute;
+  display: inline-block;
+  margin: 20px 20px 20px 20px;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 170px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {background-color: #ddd}
+
+/* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+.show {display:block;} 
+
+
+p.erro {
+    font-size: 12px;
+    color: #CD0000;
+}
+
+

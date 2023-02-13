@@ -1,0 +1,29 @@
+<?php
+
+if (!isset($_SESSION["sessao"])) {
+    exit();
+}
+$sessao = $_SESSION["sessao"];
+$nomeunidade = $sessao->getNomeUnidade();
+$codunidade = $sessao->getCodUnidade();
+$responsavel = $sessao->getResponsavel();
+$anobase = $sessao->getAnoBase();
+$aplicacoes = $sessao->getAplicacoes();
+$loginsessao = $sessao->getLogin();
+if (!$aplicacoes[48]) {
+      exit();
+}
+?>
+<head></head>
+<form>
+<div>
+<h3>Vídeo Tutorial para liberação de formulários para subunidades</h3>
+<video width="640"  height="360" src="../public/anexos/Video3.mp4"  controls preload>
+<p> <a  href="../public/anexos/Video3.mp4">video</a> </p>
+</br>
+</br>
+<p> <a  href="../public/anexos/Video3.mp4">Baixar vídeo</a> </p>
+
+  </video>
+  </div>
+</form>

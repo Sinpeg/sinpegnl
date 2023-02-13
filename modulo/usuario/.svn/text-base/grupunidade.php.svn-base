@@ -1,0 +1,149 @@
+<?php
+/*
+ * Inclui unidade no grupo
+ */
+
+$sessao = $_SESSION["sessao"];
+$nomeunidade = $sessao->getNomeUnidade();
+$responsavel = $sessao->getResponsavel();
+$anobase = $sessao->getAnoBase();
+$loginsessao = $sessao->getLogin();
+$aplicacoes = $sessao->getAplicacoes();
+if (!$aplicacoes[47]) {
+	exit();
+}
+$BASE_DIR = dirname(__FILE__) . '/';
+require_once $BASE_DIR . '../../dao/grupoDAO.php';
+require_once $BASE_DIR . '../../dao/unidadeDAO.php';
+
+$codunidade = $sessao->getCodUnidade();
+$daocat = new UnidadeDAO();
+/*
+$hierarquia = $daocat->buscahierarquia($codunidade);
+foreach($hierarquia as $hiera){
+	$hier =  addslashes($hiera["hierarquia"]);
+}
+$subunidades = $daocat->buscalunidade("", $hier);*/
+$grupo=$sessao->getGrupo();
+
+$dao = new GrupoDAO();
+$grupos = $dao->Lista($loginsessao);
+
+//Diogo - Não foi encontrado ultilidade no trecho abaixo
+//$ct = 0;
+//foreach ($_SESSION['codunidade'] as $a){
+//	++$ct;
+//}
+
+//---------------
+for($i=1; $i < 50; ++$i){
+$apgrupo[$i] = $dao->Listagrupo($i);
+}
+/*
+for($i=1; $i < 3; ++$i){
+	foreach($apgrupo[$i] as $a){
+		echo $a["NomeUnidade"];
+	}
+}*/
+/*foreach($apgrupo[1] as $as){
+$vet = $apgrupo["NomeUnidade"];
+}
+$aux;*/
+//---------------"<?php echo addslashes($_POST['cad-consulta']) 
+
+
+?>
+<script>
+
+
+function direciona() {
+	selectBox = document.getElementById("select3");
+    for (var i = 0; i < selectBox.options.length; i++) 
+    { 
+         selectBox.options[i].selected = true;
+    }
+	document.getElementById('cad-unidade').action = "<?php echo Utils::createLink('usuario', 'incgrupo'); ?>";
+    document.getElementById('cad-unidade').submit();
+}
+
+function unidadegrupo(codigo){ //Inclui as unidades que já estão presentes no grupo selecionado na lista2
+	if(codigo == "<?php echo $_POST['cad-consulta']; ?>"){
+	var x = document.getElementById("select3");
+	var option = document.createElement("option");
+	option.text = codigo + " ";
+	x.add(option);
+	}
+}
+
+
+$(document).ready(function(){ //Faz as seleção das unidades.
+	   $('#add').click(function() {//Adiciona da lista1 para a lista2
+	    return !$('#select1 option:selected').remove().appendTo('#select3');  
+	   });
+	   //remove todos
+	   $('#remove').click(function() { //Exclui todas as entradas da lista2
+		selectBox = document.getElementById("select3");
+		for (var i = 0; i < selectBox.options.length; i++){ 
+		    selectBox.options[i].selected = true;
+		}
+	    return !$('#select3 option:selected').remove().appendTo('#select1');
+	   });
+	   
+	 //  $("#lis1").click(function(){//remove item
+		//   $('#select3 option:selected').remove();
+		//});
+	   $('#lis1').click(function() {//Adiciona da lista1 para a lista2
+		    return !$('#select3 option:selected').remove().appendTo('#select1');  
+		   });
+  
+	  });
+
+
+
+</script>
+<body style="font-family:arial,helvetica,sans-serif;font-size:14px;">
+    <form name="table" id="cad-unidade" method="post">
+        <h3>Vincular subunidade do usuário a um grupo</h3> <br />
+        <div class="msg" id="msg"></div>
+        <table>
+            <tr>
+                <td style="width:17%;text-align:left;vertical-align:top" >Grupo</td>
+                <td><select name="cad-consulta" id="cad-consulta">
+                <option value="0"> -- Selecione o grupo -- </option>
+            	<?php foreach($grupos as $g){ ?>
+	                <option onclick="unidadegrupo(<?php echo $g["Codigo"]; ?>);"
+	                    <?php if($g["Codigo"] == $grupo) 
+	                    	echo "selected"; ?> value="<?php echo $g["Codigo"];?>">
+	                    	<?php echo $g["Grupo"];} ?></option>
+            	</select>
+           	</tr>
+            <tr>
+            	<td>Aplicações do grupo</td>
+                <td id="aplicgrupo">
+                </td>
+            </tr>
+            <tr>
+                <td>Unidades</td>
+               <td> <div id="selectu"></div>
+              
+				<input style="vertical-align:top" type="button" id="add" value="Incluir" class="btn btn-primary"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Unidades Selecionadas</td>
+                <td>
+             
+             <div  id="select2">
+             </div>
+             <input style='vertical-align:top' type='button' id='lis1' value='Excluir' class="btn btn-primary"/>
+               	</td>
+            
+            </tr>
+        </table>
+        <input name="operacao" type="hidden" readonly="readonly" value="I" />
+        <input type="button" onclick='direciona();' value="Gravar" class="btn btn-primary" />
+        <input style="vertical-align:top" type="button" id="remove" value="Limpar" class="btn btn-primary"/>
+    </form>
+<?php $_SESSION['codunidade'] = null; ?>
+</body>
+</html>

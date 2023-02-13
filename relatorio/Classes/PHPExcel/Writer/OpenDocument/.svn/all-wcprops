@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Writer/OpenDocument
+END
+Meta.php
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Writer/OpenDocument/Meta.php
+END
+MetaInf.php
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Writer/OpenDocument/MetaInf.php
+END
+Content.php
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Writer/OpenDocument/Content.php
+END
+WriterPart.php
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Writer/OpenDocument/WriterPart.php
+END
+Mimetype.php
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Writer/OpenDocument/Mimetype.php
+END
+Styles.php
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Writer/OpenDocument/Styles.php
+END
+Thumbnails.php
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Writer/OpenDocument/Thumbnails.php
+END
+Settings.php
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Writer/OpenDocument/Settings.php
+END

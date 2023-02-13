@@ -1,0 +1,96 @@
+<?php  class Modelo {
+    private $codigo;
+    private $legenda;
+    private $modelo;
+    private $anoinicial;
+    private $anofinal;
+    private $unidade;
+    private $topico;
+    private $situacao;
+    private $ordemintopico;
+    
+    public function __construct() {
+        
+    }
+    public function criaModeloIni($codigo, $legenda,$modelo,$anoinicial,$anofinal,$unidade,$topico,$situacao) {
+        $this->codigo = $codigo;
+        $this->legenda = $legenda;
+        $this->modelo = trim($modelo);
+        $this->situacao = $situacao;
+        $this->anofinal = $anofinal;
+        $this->anoinicial = $anoinicial;
+        $this->unidade = $unidade;
+        $this->topico = $topico;
+    }
+    
+    public function getCodigo(){
+        return $this->codigo;
+    }
+    
+    public function setCodigo($codigo){
+        $this->codigo = $codigo;
+    }
+    
+    public function getlegenda(){
+        return $this->legenda;
+    }
+    
+    public function setlegenda($legenda){
+        $this->legenda = $legenda;
+    }
+    
+    public function getmodelo(){
+        return $this->modelo;
+    }
+    
+    public function setmodelo($modelo){
+        $this->modelo = trim($modelo);
+    }
+    
+    public function getOrdemintopico(){
+        return $this->ordemintopico;
+    }
+    
+    public function setOrdemintopico($ordemintopico){
+        $this->ordemintopico = $ordemintopico;
+    }
+    
+    public function getanoinicial(){
+        return $this->anoinicial;
+    }
+    
+    public function setanoinicial($anoinicial){
+        $this->anoinicial = $anoinicial;
+    }
+    
+    public function getanofinal(){
+        return $this->anofinal;
+    }
+    
+    public function setanofinal($anofinal){
+        $this->anofinal = $anofinal;
+    }
+    
+    public function getunidade(){
+        return $this->unidade;
+    }
+    
+    public function setunidade($unidade){
+        $this->unidade = $unidade;
+    }
+    
+    public function gettopico(){
+        return $this->topico;
+    }
+    
+    public function settopico($topico){
+        $this->topico = $topico;
+    }
+    public function getSituacao(){
+        return $this->situacao;
+    }
+    
+    public function setSituacao($situacao){
+        $this->situacao = $situacao;
+    }
+}?>

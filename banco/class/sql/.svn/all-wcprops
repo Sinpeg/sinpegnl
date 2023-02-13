@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/sisraa_repositorio/!svn/ver/8/sisraa/sistema/banco/class/sql
+END
+Transaction.class.php
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/banco/class/sql/Transaction.class.php
+END
+SqlQuery.class.php
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/sisraa_repositorio/!svn/ver/8/sisraa/sistema/banco/class/sql/SqlQuery.class.php
+END
+Connection.class.php
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/sisraa_repositorio/!svn/ver/4/sisraa/sistema/banco/class/sql/Connection.class.php
+END
+ConnectionFactory.class.php
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/sisraa_repositorio/!svn/ver/4/sisraa/sistema/banco/class/sql/ConnectionFactory.class.php
+END
+QueryExecutor.class.php
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/sisraa_repositorio/!svn/ver/8/sisraa/sistema/banco/class/sql/QueryExecutor.class.php
+END
+ConnectionProperty.class.php
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/sisraa_repositorio/!svn/ver/4/sisraa/sistema/banco/class/sql/ConnectionProperty.class.php
+END

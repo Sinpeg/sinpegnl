@@ -1,0 +1,305 @@
+<?php
+sleep(2);
+require '../../dao/PDOConnectionFactory.php';
+require '../../classes/sessao.php';
+require '../../classes/unidade.php';
+
+require '../../util/Utils.php';
+/* models */
+define('MODULO_DIR', (dirname(__FILE__)) . '/../../modulo/');
+require_once MODULO_DIR . 'documentopdi/classe/Documento.php';
+require_once MODULO_DIR . 'mapaestrategico/classes/Mapa.php';
+require_once MODULO_DIR . 'documentopdi/classe/Perspectiva.php';
+require_once MODULO_DIR . 'mapaestrategico/classes/Objetivo.php';
+require_once MODULO_DIR . 'indicadorpdi/classe/Indicador.php';
+require_once MODULO_DIR . 'indicadorpdi/classe/Mapaindicador.php';
+require_once MODULO_DIR . 'calendarioPdi/classes/Calendario.php';
+require_once MODULO_DIR . 'metapdi/classe/Meta.php';
+require_once MODULO_DIR . 'resultadopdi/classes/Resultado.php';
+require_once MODULO_DIR . 'iniciativa/classe/Iniciativa.php';
+require_once MODULO_DIR . 'iniciativa/classe/IndicIniciativa.php';
+require_once MODULO_DIR . 'resultadopdi/classes/ResultIniciativa.php';
+
+
+/* DAO */
+require_once MODULO_DIR . 'documentopdi/dao/DocumentoDAO.php';
+require_once MODULO_DIR . 'mapaestrategico/dao/MapaDAO.php';
+require_once MODULO_DIR . 'indicadorpdi/dao/IndicadorDAO.php';
+require_once MODULO_DIR . 'indicadorpdi/dao/MapaIndicadorDAO.php';
+require_once MODULO_DIR . 'metapdi/dao/MetaDAO.php';
+require_once MODULO_DIR . 'resultadopdi/dao/ResultadoDAO.php';
+require_once MODULO_DIR . 'calendarioPdi/dao/CalendarioDAO.php';
+require_once MODULO_DIR . 'iniciativa/dao/IndicIniciativaDAO.php';
+require_once MODULO_DIR . 'resultadopdi/dao/ResultIniciativaDAO.php';
+
+/* fim */
+session_start();
+$sessao = $_SESSION["sessao"];
+$anobase = $sessao->getAnobase();   // ano base
+$coddoc = $_POST["doc"];
+$codmapind = $_POST["indicador"];//na realidade é passado codigo do mapaindicador
+$unidade=new Unidade();
+//echo "Selecionada ".$sessao ->getCodunidsel();
+if (!empty($sessao->getCodunidsel())) {
+        $unidade->setCodunidade($sessao->getCodunidsel());
+        $unidade->setNomeunidade($sessao->getNomeunidsel());
+    }
+else {
+        $unidade->setCodunidade($sessao->getCodunidade());
+        $unidade->setNomeunidade($sessao->getNomeunidade());
+    }
+
+
+$daodoc = new DocumentoDAO();
+$daomapind = new MapaIndicadorDAO();
+//Buscar documento
+$rows = $daodoc->buscadocumento($coddoc);
+foreach ($rows as $row) {
+    
+  //  if ($anobase >= $row['anoinicial'] &&
+    //        $anobase <= $row['anofinal'] && $row['situacao'] = 'A') {
+        $unidadeDoPlano=new Unidade();
+        $unidadeDoPlano->setCodunidade($row['CodUnidade']);
+        $unidadeDoPlano->criaDocumento($row['codigo'],$row['nome'],$row['anoinicial'],$row['anofinal'],$row['situacao'],$row['missao'],$row['visao'],null,null) ;
+        
+        $objdoc=$unidadeDoPlano->getDocumento();
+   // }
+}
+
+//B$j++;uscar calendário para o ano 
+ $daocal= new CalendarioDAO();
+        $rows = $daocal->verificaPrazoCalendarioDoDocumento($sessao->getAnoBase());
+        if (!empty($rows)){
+            foreach ($rows as $row) {
+                $habilita=$row['habilita'];
+                $objcal= new Calendario();
+                $objcal->setCodigo( $row['codCalendario']);
+                //echo "calendario caldao".$row['codCalendario']."ano ".$sessao->getAnoBase();
+                $objcal->setDocumento( NULL );
+                $objcal->setDatainianalise(NULL);
+                $objcal->setDatafimanalise(NULL);
+                $objcal->setAnogestao($row['anoGestao']);
+                $objcal->setUnidade(NULL);
+           }
+          }
+        
+
+//Buscar mapas do documento
+$daomapa = new MapaDAO();
+$rows = $daomapa->lista();
+$objmapa = array();
+$cont = 0;
+foreach ($rows as $row) {
+    if ($objdoc->getCodigo() == $row['CodDocumento']) {
+        $cont++;
+        $objpers=new Perspectiva();
+        $objpers->setCodigo($row["codPerspectiva"]);
+        $objobj=new Objetivo();
+        $objobj->setCodigo($row["codObjetivoPDI"]);
+        $objdoc->criaMapa($row['Codigo'], $objpers, $objobj,  $unidadeDoPlano, null, null);
+        $objmapa[$cont] =$objdoc->getMapa();     
+    }
+}
+
+
+$daomapind = new MapaIndicadorDAO();
+$rows = $daomapind->buscaMapaIndicador($codmapind);
+$cont1 = 0;
+//echo "código do indicador ".$codind."</br>";
+//echo "unidade".$unidade->getCodunidade()."</br>";
+foreach ($rows as $row) {
+    for ($i = 1; $i <= $cont; $i++) {
+       if ($objmapa[$i]->getCodigo() == $row['codMapa'] 
+        && $row['PropIndicador'] == $unidade->getCodunidade()) {
+             //   echo $i."-". $objmapa[$i]->getCodigo()."=".$row['codMapa']."--".$row['PropIndicador']."=". $unidade->getCodunidade()."=".$row['nome']."</br>";
+                 $cont1++;             
+                 $objetoind =new Indicador();
+                 $objetoind ->setCodigo($row['codIndicador']);
+                 $objetoind ->setNome($row['nome']);
+                 $objmapa[$i]->criaMapaIndicador($row['codigo'],$objetoind,$unidade->getCodunidade() ) ;
+                 $objmapind=$objmapa[$i]->getMapaindicador();
+       }
+    }///for
+}//foreach
+if ($cont1==0){
+    echo "Não há indicador para este Plano de Desenovolvimento!";
+}
+else{
+            $daometa = new MetaDAO();
+            //echo "valores objmapind->getCodigo() e objcal->getCodigo()".$objmapind->getCodigo()."-".$objcal->getCodigo();
+
+            $rows = $daometa->buscarmetaindicador($objmapind->getCodigo(),$objcal->getCodigo());
+            foreach ($rows as $row) {
+                   // echo "meta".$row["meta"]." ".$row["periodo"]."Anual ".$row["Codigo"].'</br>';
+                    $objmapind->criaMeta($row["Codigo"],$objcal->getCodigo(),$row["periodo"],$row["meta"],$row["metrica"],$row["cumulativo"]);
+                    $objmeta=$objmapind->getMeta();
+            }
+
+            /*
+             * Tipo da coleta da meta 
+             * A: anual (somente um período)
+             * M: mensal (12 períodos de janeiro a dezembro)
+             * T: trimestral (4 períodos)
+             * S: semestral (2 períodos)
+             * P: anual, com duas entradas parcial e final
+             */
+            $p = array(
+                'A' => array('Ano de ' . $anobase),
+                'M' => array('janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho',
+                    'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'),
+                'T' => array('1º trimestre', '2º trimestre', '3º trimestre', '4º trimestre'),
+                'S' => array('1º semestre', '2º semestre'),
+                'P'=> array('Parcial', 'Final')
+            );
+            $periodo = $p[$objmeta->getPeriodo()];
+            
+            $fimperiodo=count($periodo);
+            if ($objmeta->getPeriodo()=='P'){
+                if ($habilita=='Parcial'){
+                    $fimperiodo=1;
+                }
+            }
+            ?>
+                
+
+            <table class="tab_resultado">
+                <thead>
+                    <tr>
+                        <th>Período</th>
+                        <th>Métrica</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php 
+                          for ($i = 0; $i <$fimperiodo; $i++){ ?>
+                        <tr>
+                            <td><?php echo $periodo[$i]; ?></td>
+                            <?php
+                                                                
+                            $daores = new ResultadoDAO();
+                                                                   
+                            $rows = $daores->buscaresultadometa1($objmeta->getCodigo(), ($i + 1));
+                            if ($rows->rowCount() == 0) { // não encontrou nenhum resultado
+                                $valor = '-';
+                                $img = 'webroot/img/add.png';
+                                $metrica = '-';
+                                $url = Utils::createLink('resultadopdi', 'adicionares', array('periodo' => ($i + 1),
+                                            'mperiodo'=>$objmeta->getPeriodo(),
+                                            'meta' => $objmeta->getCodigo(),
+                                            'objetivo' => $objmeta->getMapaindicador()->getMapa()->getCodigo(),
+                                            'indicador' => $objmeta->getMapaindicador()->getCodigo(),
+                                            'documento' => $objdoc->getCodigo())
+                                );
+                            }
+                            else { // caso contrário, deve-se alterar o resultado
+                                foreach ($rows as $row) {
+                                    $valor = $row['meta_atingida'];
+                                    $img = "webroot/img/editar.gif";
+                                    $metrica = ($objmeta->getMetrica() == "Q") ? ("quantitativo") : ("percentual");
+                                    $url = Utils::createLink('resultadopdi', 'altresultado', array('periodo' => ($i + 1),
+                                                'mperiodo'=>$objmeta->getPeriodo(),
+                                                'meta' => $objmeta->getCodigo(),
+                                                'objetivo' =>$objmeta->getMapaindicador()->getMapa()->getCodigo(),
+                                                'indic$objmeta->getMapaindicador()->getCodigo()ador' => $objmeta->getMapaindicador()->getCodigo(),
+                                                'documento' => $objdoc->getCodigo()
+                                                    )
+                                    );
+                                   
+                                }
+                            }
+                            ?>
+                            <td><?php echo $metrica; ?></td>
+                            <td><a href="<?php print $url; ?>"><img src="<?php print $img; ?>"/></a></td>
+                        </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
+
+
+             <?php   
+                $daoii=new IndicIniciativaDAO();
+    //echo $objmeta->getMapaindicador()->getCodigo();
+                //$rows=$daoii->iniciativaPorMapIndicador($objmeta->getMapaindicador()->getCodigo());
+                $rows=$daoii->iniciativaPorMapIndicador($objmeta->getMapaindicador()->getCodigo(),$anobase);
+                $vinic=array();
+                $i=0;
+                foreach ($rows as $r){
+                    $vinic[$i]=new Iniciativa();
+                    $vinic[$i]->setCodIniciativa($r['codIniciativa']);
+                    $vinic[$i]->setNome($r['nome']);
+                    $vinic[$i]->setFinalidade($r['finalidade']);
+                    $vinic[$i]->criaIndicIniciativa($r['codindinic'],$objmeta->getMapaindicador());
+                    
+                    $i++;
+                }
+
+?>
+
+             <p><strong>Inciativas associadas ao indicador</strong></p>
+             <table class="tab_resultado">
+                <thead>
+                    <tr>
+                                                <th>Período</th>
+
+                        <th>Inciativa</th>
+                        <th>Finalidade</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <?php 
+                   for ($i = 0; $i < $fimperiodo; $i++){ 
+                        for ($j = 0; $j < count($vinic); $j++){ ?>
+                        <tr>
+                             <td><?php echo $periodo[$i]; ?></td>
+
+
+                            <td><?php echo $vinic[$j]->getNome(); ?></td>
+                            <td><?php echo $vinic[$j]->getFinalidade(); ?></td>
+                            <?php  
+                            $daor=new ResultIniciativaDAO();
+                            $rows=$daor->iniciativaPorResultado($vinic[$j]->getIndicIniciativa()->getCodigo(), $sessao->getAnobase(),($i + 1)); 
+                           //alterar
+                            if ($rows==NULL || $rows->rowCount() == 0) { // não encontrou nenhum resultado
+                                $img1 = 'webroot/img/add.png';
+                                $metrica = '-';
+                                $url1 = Utils::createLink('resultadopdi', 'adicionarinic', array('periodo' => ($i + 1),
+                                            'mperiodo'=>$objmeta->getPeriodo(),
+                                            'meta' => $objmeta->getCodigo(),
+                                            'iniciativa' => $vinic[$j]->getCodIniciativa(),
+                                            'objetivo' => $objmeta->getMapaindicador()->getMapa()->getCodigo(),
+                                            'indicador' => $objmeta->getMapaindicador()->getCodigo(),
+                                            'documento' => $objdoc->getCodigo())
+                                );
+                            }
+                            else { // caso contrário, deve-se alterar o resultado
+                                foreach ($rows as $row) {
+                                    $img1 = "webroot/img/add.gif";
+                                    $metrica = ($objmeta->getMetrica() == "Q") ? ("quantitativo") : ("percentual");
+                                    $url1 = Utils::createLink('resultadopdi', 'altresultIniciativa', array('periodo' => ($i + 1),
+                                                'mperiodo'=>$objmeta->getPeriodo(),
+                                                'meta' => $objmeta->getCodigo(),
+                                                'iniciativa' => $vinic[$j]->getCodIniciativa(),
+                                                'objetivo' =>$objmeta->getMapaindicador()->getMapa()->getCodigo(),
+                                                'indicador' => $objmeta->getMapaindicador()->getCodigo(),
+                                                'documento' => $objdoc->getCodigo()
+                                                    )
+                                    );
+                                    
+                                }
+                            } 
+                            
+                            ?>
+                            <td><a href="<?php print $url1; ?>"><img src="<?php print $img1; ?>"/></a></td>
+                        </tr>
+                    <?php 
+                         }
+                    
+                   }?>
+                </tbody>
+            </table>
+
+<?php 
+    }//else?>

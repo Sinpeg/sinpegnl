@@ -1,0 +1,248 @@
+<?php 
+$sessao = $_SESSION["sessao"];
+$aplicacoes = $sessao->getAplicacoes();
+
+require_once 'classes/topico.php';
+require_once 'dao/topicoDAO.php';
+
+//Busca os tópicos da unidade
+$daoTopicos = new RaaDAO();
+$rowsT = $daoTopicos->buscartopicos($codunidade,$anobase);
+
+//Buscar tópicos padroes
+$rowsTopicosP = $daoTopicos->buscartopicospadroes($anobase);
+
+//Buscar tópicos padroes
+$rowConsideracoes = $daoTopicos->buscarconsideracoes($anobase);
+
+//Declaração de variáveis
+$vetTopicos = array(); // Vetor para guardar os registros de tópicos
+$count = 0;	//Contador
+$countTP = 0;//Quantidade de tópicos padrões
+$countTU = 0;//Quantidade de tópicos da unidade
+
+/*
+foreach ($rowsT as $row){
+	$count++;
+}
+echo $count;
+*/
+?>
+<head>
+	<div class="bs-example">
+		<ul class="breadcrumb">
+			<li class="active">Consultar Tópicos</li>
+		</ul>
+	</div>
+</head>
+<fieldset>
+        <legend>Consultar Tópicos</legend>
+       
+        <table  >
+		
+            <tr class="ui-state-default">
+                <th><span class="glyphicon glyphicon-sort"></span>&ensp;&ensp;Ordem</th>
+                <th>Tópicos</th>
+                <th>Editar</th>                          
+                <th>Subtopicos</th> 
+                <th>Criar Modelo</th>            
+            </tr>
+               
+        <tbody id="ordenarCorpoTopico">
+		 <?php
+		 if($codunidade != 100000){
+			 //Exibe os tópicos padrões 
+			 foreach ($rowsTopicosP as $row){		 
+			 	if($row['situacao'] == 1){ $class = "ui-state-default";}else{ $class = "ui-state-default ";}
+			 	echo "<tr data-name='".$row['codigo']."' class='ui-state-default desabilitar'><td>".$row['ordem']."</td><td width='50%'>".$row['titulo']."</td><td></td><td><img src='webroot/img/recuo.png' onClick='modalSubPadrao(".$row['codigo'].",".$anobase.")' data-toggle='modal' data-target='#subtopicosPadroes' /> </td><td></td></tr>";
+			 	$countTP++;
+			 }
+		 }
+		 //Exibe os tópicos da unidade
+		  foreach ($rowsT as $row){		 
+		 	echo "<tr  data-name='".$row['codigo']."' class='ui-state-default info'><td>".$row['ordem']."</td><td width='50%'>".$row['titulo']."</td><td><img src='webroot/img/editar.gif' onClick='modalEditar(".$row['codigo'].")' data-toggle='modal' data-target='#editarTopico' /></td><td><a href='".Utils::createLink('raa', 'inserirSubtopico', array('topico' => $row['codigo'] ))."' target='_self' ><img src='webroot/img/recuo.png' /> </a></td><td><a href='".Utils::createLink('raa', 'criarModelo', array('topico' => $row['codigo'] ))."' target='_self' ><img src='webroot/img/modelo.png' /></a></td></tr>";
+		 	$countTU++;
+		 }?>	 
+		 </tbody>
+		</table>
+		<table class="tablesorter-dropbox">
+	<thead>
+            <tr class="ui-state-default">
+           		<th>Ordem</td>
+                <th>Tópico  Padrão</th>
+                <th>Editar</th>
+                <th>Subtopicos</th>
+                <?php 
+    	 			if($codunidade == 100000){
+					 	echo	"<th>Criar Modelo</th>";
+					}  
+				?>      
+            </tr>
+           </thead>
+            <tbody>
+    	 <?php 
+    	 	if($codunidade != 100000){
+	    	 	foreach ($rowConsideracoes as $row){		 
+				 	$countCF = $countTP+$countTU+1;		    	 	
+				 	echo "<tr class='ui-state-default'><td>".$countCF."</td><td width='50%'>".$row['titulo']."</td><td></td><td><img src='webroot/img/recuo.png' onClick='modalSubPadrao(".$row['codigo'].",".$anobase.")' data-toggle='modal' data-target='#subtopicosPadroes' /></td></tr>";
+		 		}
+		 			
+		 	}else{
+		 		foreach ($rowConsideracoes as $row){
+					$countCF = $countTP+$countTU+1;
+					
+					echo "<tr class='ui-state-default success'><td>".$countCF."</td><td width='50%'>".$row['titulo']."</td><td><img src='webroot/img/editar.gif' onClick='modalEditar(".$row['codigo'].")' data-toggle='modal' data-target='#editarTopico' /></td><td><a href='".Utils::createLink('raa', 'inserirSubtopico', array('topico' => $row['codigo'] ))."' target='_self' ><img src='webroot/img/recuo.png' /> </a></td><td><a href='".Utils::createLink('raa', 'criarModelo', array('topico' => $row['codigo'] ))."' target='_self' ><img src='webroot/img/modelo.png' /> </a></td></tr>";
+				}
+		 	}
+			?>	
+			</tbody>	 
+		</table>	
+		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#cadastrarTopico">Criar Tópico</button> 
+		    
+</fieldset>
+
+
+
+<!-- Modal Inserir-->
+<div class="modal fade" id="cadastrarTopico" tabindex="-1" role="dialog" aria-labelledby="cadastrarTopico" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Criar Tópico</h4>
+        </div>
+      <div class="modal-body">
+      
+         <div id="msg"></div>
+         
+        <form name="form-criarTopico" id="form-criarTopico" method="POST"  >
+		    <fieldset>		       
+		        <table>
+		        <tr><td>Título do Tópico</td><td><input type="text"  class="form-control" name="titulo" id="titulo"/></td></tr>
+		        <input type="hidden" name="situacao" value="1" id="situacao"/>
+		        </table>
+		   </fieldset>
+		   <!-- Dados hidden -->
+		   <input type="hidden" name="operacao" value="I">
+		   <input type="hidden" name="codUnidade" value="<?php echo $codunidade?>">
+		   <input type="hidden" name="anobase" value="<?php echo $anobase?>">
+		</form>
+      
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+        <button type="button" id="btnCriarTopico" class="btn btn-primary">Criar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal Editar-->
+<div class="modal fade" id="editarTopico" tabindex="-1" role="dialog" aria-labelledby="editarTopico" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Editar Tópico</h4>
+        </div>
+      <div class="modal-body">
+      
+         <div id="msg2"></div>
+         
+        <form name="form-editarTopico" id="form-editarTopico" method="POST"  >
+		    <fieldset>		       
+		        <table>
+		        <tr><td>Título do Tópico</td><td><input type="text" class="form-control" name="titulo" id="editarTitulo"/></td></tr>
+		        <tr><td>Válido</td><td><input type="checkbox" name="situacao" value="1" id="editarSituacao"/></td></tr>
+		        </table>
+		   </fieldset>
+		   <!-- Dados hidden -->
+		   <input type="hidden" name="operacao" value="A">
+		   <input type="hidden" name="codUnidade" value="<?php echo $codunidade?>">
+		   <input type="hidden" name="codTopico" id="codTopico" value="">
+		   <input type="hidden" name="anobase" value="<?php echo $anobase?>">
+		</form>
+      
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+        <button type="button" id="btnSalvarTopico" class="btn btn-primary">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal Excluir-->
+<div class="modal fade" id="excluirTopico" tabindex="-1" role="dialog" aria-labelledby="excluirTopico" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Excluir Tópico</h4>
+        </div>
+      <div class="modal-body">         
+        <form name="form-excluirTopico" id="form-excluirTopico" method="POST"  >
+		    <fieldset>		       
+		          <p>Deseja realmente excluir o tópico "<span id="tituloTopicoExcluir"></span>" ?</p>
+		   </fieldset>
+		   <input type="hidden" name="codTopico" id="codTopico" value="">
+		</form>
+      
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Não</button>
+        <button type="button" id="btnExcluirTopico" class="btn btn-primary">Sim</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Exibir Subtopicos padroes-->
+<div class="modal fade" id="subtopicosPadroes" tabindex="-1" role="dialog" aria-labelledby="subtopicosPadroes" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Subtopicos</h4>
+        </div>  
+      <div class="modal-body">      
+      	<div id="divSubtopicosPadroes"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+<style>
+<!--
+.modal {
+  text-align: center;
+  padding: 0!important;
+}
+
+.modal:before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+  margin-right: -4px;
+}
+
+.modal-dialog {
+  display: inline-block;
+  text-align: left;
+  vertical-align: middle;
+}
+-->
+</style>
+

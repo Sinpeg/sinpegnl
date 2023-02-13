@@ -1,0 +1,41 @@
+8
+
+dir
+3
+http://10.1.19.179/svn/sisraa_repositorio/sisraa/sistema/modulo/uparquivo/dao
+http://10.1.19.179/svn/sisraa_repositorio
+
+
+
+2018-07-31T18:23:14.307199Z
+1
+dinfi
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+f459bd6a-6f71-459b-a450-08f2ec089600
+
+arquivoDAO.php
+file
+
+
+
+
+2018-07-31T18:25:23.000000Z
+a1cbd7297f48a74065106d58d14466b9
+2018-07-31T18:23:14.307199Z
+1
+dinfi
+has-props
+

@@ -1,0 +1,53 @@
+<?php
+$BASE_DIR = dirname(__FILE__) . '/';
+require_once $BASE_DIR . '../../dao/PDOConnectionFactory.php';
+require_once $BASE_DIR . '../../dao/unidadeDAO.php';
+require $BASE_DIR . '../../classes/unidade.php';
+?>
+<?php
+require_once($BASE_DIR . '../../classes/sessao.php');
+session_start();
+if (!isset($_SESSION["sessao"])) {
+    exit();
+} else {
+    $sessao = $_SESSION["sessao"];
+    $codunidade = $sessao->getCodUnidade();
+    $aplicacoes = $sessao->getAplicacoes();
+    
+    if (!$aplicacoes[3]) {
+        $mensagem = urlencode(" ");
+    }
+    $cont = 1;
+    $daocat = new UnidadeDAO();
+    $parametro = addslashes($_POST["parametro"]);
+    if ($parametro == "") {
+        $display = "Preencha o campo unidade!";
+        echo $display;
+    } elseif (is_string($parametro)) {
+    	$hierarquia = $daocat->buscahierarquia($codunidade);
+    	foreach($hierarquia as $hiera){
+    	$hier =  addslashes($hiera["hierarquia"]);
+    	}
+    	
+        $rows = $daocat->buscalunidade($parametro, $hier);
+        $unidades = array();
+        foreach ($rows as $row) {
+            $cont++;
+            $unidades[$cont] = new Unidade();
+            $unidades[$cont]->setCodunidade($row["CodUnidade"]);
+            $unidades[$cont]->setNomeunidade($row["NomeUnidade"]);
+        }
+
+        $display = "<select multiple class='custom-select' size=5 name=unidade>";
+        foreach ($unidades as $u) {
+            $display .="<option  value=";
+            $display .=$u->getCodunidade() . ">";
+            $display .=$u->getNomeunidade() . "</option>";
+        }
+        $display.="</select>";
+
+        $daocat->fechar();
+        echo $display;
+    }
+}
+?>

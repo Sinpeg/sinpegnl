@@ -1,0 +1,30 @@
+<?php
+//Exibir Erros
+ini_set('display_errors',1);
+ini_set('display_startup_erros',1);
+error_reporting(E_ALL);
+
+require_once '../../dao/PDOConnectionFactory.php';
+require_once '../../modulo/raa/dao/topicoDAO.php';
+
+$topicoDAO = new RaaDAO();
+
+$codTopico = $_POST['codTopico'];
+$anobase = $_POST['anobase'];
+
+$rowsSub = $topicoDAO->buscarsubtopicospadroes($codTopico,$anobase);
+
+$html = '<table class="table table-bordered table-hover">
+			<thead>
+            <tr class="ui-state-default">
+           		<th>Ordem</th>
+                <th>Subtopicos</th>             
+            </tr></thead><tbody >';
+
+foreach($rowsSub as $row){
+	//Corpo da tabela 	
+	$html .= "<tr><td>".$row['ordem']."</td><td>".$row['titulo']."</td></tr>";
+}
+$html .="</tbody></table>"; 
+echo $html;
+?>

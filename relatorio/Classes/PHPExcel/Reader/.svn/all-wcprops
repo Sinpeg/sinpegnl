@@ -1,0 +1,83 @@
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Reader
+END
+IReadFilter.php
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Reader/IReadFilter.php
+END
+Gnumeric.php
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Reader/Gnumeric.php
+END
+IReader.php
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Reader/IReader.php
+END
+CSV.php
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Reader/CSV.php
+END
+Excel2007.php
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Reader/Excel2007.php
+END
+Excel2003XML.php
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Reader/Excel2003XML.php
+END
+Exception.php
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Reader/Exception.php
+END
+DefaultReadFilter.php
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Reader/DefaultReadFilter.php
+END
+OOCalc.php
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Reader/OOCalc.php
+END
+SYLK.php
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Reader/SYLK.php
+END
+Abstract.php
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Reader/Abstract.php
+END
+Excel5.php
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Reader/Excel5.php
+END
+HTML.php
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/Reader/HTML.php
+END

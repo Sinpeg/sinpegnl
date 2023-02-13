@@ -1,0 +1,103 @@
+<?php
+require_once MODULO_DIR . 'documentopdi/classe/Documento.php';
+require_once MODULO_DIR . 'documentopdi/dao/DocumentoDAO.php';
+$sessao = $_SESSION['sessao'];
+$codunidade = $sessao->getCodUnidade();
+$aplicacoes = $sessao->getAplicacoes();
+
+if (!$aplicacoes[36]) {
+    print "Erro ao acessar esta aplicação";
+    exit();
+}
+
+$daodoc = new DocumentoDAO();
+
+$codunidade = ($sessao->getCodunidsel())?$sessao->getCodunidsel():$sessao->getCodUnidade();
+$rowsdoc = $daodoc->buscadocumentoporunidade($codunidade);
+?>
+ 
+<script language="JavaScript">
+	function direciona() {
+		var erro=false;
+			
+		var extensoesOk = ",.rar,.zip,";
+		var extensao = "," + document.adicionar.userfile.value.substr(document.adicionar.userfile.value.length - 4).toLowerCase() + ",";
+		var conceptName = $('#documentoAval').find(":selected").text();
+		if(conceptName=="Selecione o documento..."){
+			document.getElementById('msg').innerHTML = "Selecione um documento!";
+			erro= true;
+		}else if (document.adicionar.avaliacaofinal.value == ""){
+			document.getElementById('msg').innerHTML = "Informe sua avaliacão final!";
+			erro=true ;
+		}else if (document.adicionar.userfile.value == ""){
+			document.getElementById('msg').innerHTML = "O campo do arquivo est&aacute; vazio!!";
+			erro= true;
+		}
+		else if (extensoesOk.indexOf(extensao) == -1){
+			alert(extensao);
+			document.getElementById('msg').innerHTML = "Envie arquivos compactados (extens&atilde;o .rar ou .zip).";
+			erro=true ;
+		Nome
+		}
+		if (!erro){
+			document.getElementById('adicionar').action = "?modulo=avaliacao&acao=gravaAvaliacaofinal";
+			document.getElementById('adicionar').submit();
+		}
+	}
+</script>
+
+<div id="msg"></div>
+
+<div class="card card-info">
+	<form class="form-horizontal" enctype="multipart/form-data" name="adicionar" id="adicionar" method="POST" >
+		<legend>Registrar / Editar Avaliação</legend>
+		<div id="resultado"></div>
+			
+		<input class="form-control"type="hidden" value="E" name="op" />
+			
+		<div id="tabela">	
+			<table>
+				<tr>
+					<td>
+						<label>Documento: </label>
+					</td>
+					<td>
+						<select class="custom-select" name="codDocumento" id="documentoAval" class="sel1">
+							<option value="0" selected>Selecione o documento...</option>
+							<?php foreach ($rowsdoc as $row) : ?>
+								<?php $ano = $row['anoinicial']; ?>
+								<option value=<?php print $row["codigo"]; ?>  ><?php print $row['nome'] ?><?php print ' (' . $row['anoinicial'] . '-' . $row['anofinal'] . ')'; ?></option>
+							<?php endforeach; ?>
+						</select><br>
+					</td>
+				</tr>
+					
+				<tr>
+					<td><label>Avaliação Final</label></td>
+					<td><textarea class="area" name="avaliacaofinal" rows="10" cols="50"></textarea></td>
+				</tr>
+				
+				
+				<tr>                     
+					<td><label>Ata Avaliação</label></td>
+					<td></td>
+				</tr>  
+				<tr>
+					<td colspan="2" align="center">
+						<input class="form-control"type="hidden" name="funcao" value="salvar" />
+						<input type="button" value="gravar" onclick="direciona();" name="salvar" class="btn btn-info"/>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</form>
+</div>
+
+<script>
+	function verificaAvaliacao(documento){
+		$("#tabela").empty();
+		$.ajax({url: "ajax/avaliacaofinal/ajaxAvaliacao.php", type: 'POST', data:{codDocumento:documento.value}, success: function(result){
+			$("#tabela").html(result);
+		}});	
+	}
+</script>

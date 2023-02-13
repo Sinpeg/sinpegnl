@@ -1,0 +1,58 @@
+ <?php
+ class Texto {
+ 	private $codigo;
+ 	private $topico;
+ 	private $desctexto;
+ 	private $unidade;
+  	private $ano;
+ 	
+
+ 	public function __construct() {
+ 	
+ 	}
+
+ 	public function getCodigo(){
+ 		return $this->codigo;
+ 	}
+
+ 	public function setCodigo($codigo){
+ 		$this->codigo = $codigo;
+ 	}
+
+ 	public function getTopico(){
+ 		return $this->topico;
+ 	}
+
+ 	public function setTopico(Topico $topico){
+ 		$this->topico = $topico;
+ 	}
+ 		
+  	
+ 	
+ 	public function getDesctexto(){
+ 		return $this->desctexto;
+ 	}
+ 	
+ 	public function setDesctexto($desctexto){
+ 		$this->desctexto = $desctexto;
+ 	}
+ 	
+ public function getUnidade(){
+ 		return $this->unidade;
+ 	}
+ 	
+ 	public function setUnidade(Unidade $unidade){
+ 		$this->unidade = $unidade;
+ 	}
+ 	
+ 
+ 	public function getAno(){
+ 		return $this->ano;
+ 	}
+ 	
+ 	public function setAno($ano){
+ 		$this->ano = $ano;
+ 	}
+ 	
+ }
+ ?>

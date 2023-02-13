@@ -1,0 +1,89 @@
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/sisraa_repositorio/!svn/ver/138/sisraa/sistema/ajax/raa
+END
+excluirModeloAjax.php
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/sisraa_repositorio/!svn/ver/75/sisraa/sistema/ajax/raa/excluirModeloAjax.php
+END
+buscarModelosTopicoAjax.php
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/sisraa_repositorio/!svn/ver/96/sisraa/sistema/ajax/raa/buscarModelosTopicoAjax.php
+END
+ordenarSubtopicoAjax.php
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/sisraa_repositorio/!svn/ver/68/sisraa/sistema/ajax/raa/ordenarSubtopicoAjax.php
+END
+raaajax.php
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/sisraa_repositorio/!svn/ver/137/sisraa/sistema/ajax/raa/raaajax.php
+END
+modeloAjax.php
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/sisraa_repositorio/!svn/ver/101/sisraa/sistema/ajax/raa/modeloAjax.php
+END
+retornaModelo.php
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/sisraa_repositorio/!svn/ver/149/sisraa/sistema/ajax/raa/retornaModelo.php
+END
+buscarModeloAjax.php
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/sisraa_repositorio/!svn/ver/75/sisraa/sistema/ajax/raa/buscarModeloAjax.php
+END
+buscarSubPadroesAjax.php
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/sisraa_repositorio/!svn/ver/101/sisraa/sistema/ajax/raa/buscarSubPadroesAjax.php
+END
+subtopicoAjax.php
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/sisraa_repositorio/!svn/ver/101/sisraa/sistema/ajax/raa/subtopicoAjax.php
+END
+buscarTopicoAjax.php
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/sisraa_repositorio/!svn/ver/68/sisraa/sistema/ajax/raa/buscarTopicoAjax.php
+END
+registraTexto.php
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/sisraa_repositorio/!svn/ver/150/sisraa/sistema/ajax/raa/registraTexto.php
+END
+ordenarModeloAjax.php
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/sisraa_repositorio/!svn/ver/96/sisraa/sistema/ajax/raa/ordenarModeloAjax.php
+END
+ordenarTopicoAjax.php
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/sisraa_repositorio/!svn/ver/68/sisraa/sistema/ajax/raa/ordenarTopicoAjax.php
+END
+excluirTopicoAjax.php
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/sisraa_repositorio/!svn/ver/68/sisraa/sistema/ajax/raa/excluirTopicoAjax.php
+END

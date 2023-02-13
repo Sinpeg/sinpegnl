@@ -1,0 +1,270 @@
+<?php
+$sessao = $_SESSION['sessao'];
+$codestruturado = $sessao->getCodestruturado();
+$codUnidade = $sessao->getCodunidade();
+$aplicacoes = $sessao->getAplicacoes(); // código das aplicações
+//$codmapa = $_POST['codmapa'];
+$coddoc=$_SESSION['coddoc'] ;
+$codmapa = $_SESSION['codmapa'] ;
+$daodoc = new DocumentoDAO();
+
+$c=new Controlador();
+if (!$c->getProfile($sessao->getGrupo())) {
+   $rowsdoc = $daodoc->buscadocumentoporunidadePeriodoSemPDI($codUnidade, $sessao->getAnobase());
+}else{
+   $rowsdoc = $daodoc->lista($anobase);
+  
+}
+
+$daoobjetivo=new ObjetivoDAO();
+ $rowsobjetivo = $daoobjetivo->buscaObjetivoPorMapa($codmapa);
+		$objobjetivo = new Objetivo();
+		foreach ($rowsobjetivo as $rowobjetivo)
+		{
+			$objobjetivo->setCodigo($rowobjetivo['codobj']);
+			$objobjetivo->setObjetivo($rowobjetivo['des']);
+		}
+
+?>
+<?php
+
+if (!$aplicacoes[38]) {
+    print "Erro ao acessar esta aplicação";
+    exit();
+}
+?>
+<?php
+/*
+$daounidade = new UnidadeDAO();
+$rows = $daounidade->buscasubunidades00($codestruturado);
+$unidade = array();
+$cont = 0;
+foreach ($rows as $row) {
+	$unidade[$cont] = new Unidade();
+	$unidade[$cont]->setCodunidade($row['CodUnidade']);
+	$unidade[$cont]->setNomeunidade($row['NomeUnidade']);
+	$cont++;
+}
+
+$daodoc = new DocumentoDAO();
+$objdoc = array();
+$cont1 = 0;
+for ($i = 0; $i < $cont; $i++) {
+	$daodoc = new DocumentoDAO();
+	$rows = $daodoc->buscadocumentoporunidade($unidade[$i]->getCodunidade());
+	foreach ($rows as $row) {
+		$objdoc[$cont1] = new Documento();
+		$objdoc[$cont1]->setCodigo($row['codigo']);
+		$objdoc[$cont1]->setNome($row['nome']);
+		$objdoc[$cont1]->setUnidade($unidade[$i]);
+		$objdoc[$cont1]->setAnoInicial($row['anoinicial']);
+		$objdoc[$cont1]->setAnoFinal($row['anofinal']);
+		$cont1++;
+	}
+}
+
+$daomapa = new MapaDAO();
+$daoobjetivo = new ObjetivoDAO();
+$objmapa = array();
+$objobjetivo = array();
+$cont2 = 0;
+for ($i = 0; $i < $cont1; $i++) {
+	$rows = $daomapa->buscamapadocumento($objdoc[$i]->getCodigo());
+	foreach ($rows as $row) {
+		$objmapa[$cont2] = new Mapa();
+		$objmapa[$cont2]->setCodigo($row['Codigo']);
+		$rowsobjetivo = $daoobjetivo->buscaobjetivo($row['codObjetivoPDI']);
+		foreach ($rowsobjetivo as $rowobjetivo)
+		{
+			$objobjetivo[$cont2] = new Objetivo();
+			$objobjetivo[$cont2]->setCodigo($rowobjetivo['Codigo']);
+			$objobjetivo[$cont2]->setObjetivo($rowobjetivo['Objetivo']);
+		}
+		$objmapa[$cont2]->setObjetivoPDI($objobjetivo[$cont2]);
+		$objmapa[$cont2]->setDocumento($objdoc[$i]);
+		$cont2++;
+	}
+}
+
+ $daoind = new IndicadorDAO();
+$objind = array();
+$cont3 = 0;
+for ($i = 0; $i < $cont2; $i++) {
+    $rows = $daoind->buscaindicadorpormapa2($objmapa[$i]->getCodigo());
+    foreach ($rows as $row) {
+        $objind[$cont3] = new Indicador();
+        $objind[$cont3]->setCodigo($row['Codigo']);
+        $objind[$cont3]->setMapa($objmapa[$i]);
+        $objind[$cont3]->setIndicador($row['indicador']);
+        $objind[$cont3]->setValidade($row['validade']);
+        $cont3++;
+    }
+}
+*/
+
+$daoind = new IndicadorDAO();
+$objind = array();
+$cont3 = 0;
+	$rows = $daoind->listaIndicadorNaoVinculado1($sessao->getAnobase(),$coddoc,$codUnidade);
+	foreach ($rows as $row) {
+		$objind[$cont3] = new Indicador();
+		$objind[$cont3]->setCodigo($row['Codigo']);		
+		$objind[$cont3]->setNome($row['nome']);
+		$objind[$cont3]->setValidade($row['validade']);
+		$objind[$cont3]->setCesta($row['cesta']);
+		
+		$cont3++;
+}
+/*
+if ($cont3 == 0) {
+    Utils::redirect('indicadorpdi', 'incluiindicador');
+}
+*/
+?>
+
+<script>
+    $(function() {
+        $("#tablesorter")
+                .tablesorter({
+                    widthFixed: true,
+                    headers: {
+                        3: {
+                            sorter: false
+                        }
+                    },
+                    widgets: ['zebra']
+                }
+                ).tablesorterPager(
+                {
+                    container: $("#pager"),
+                    positionFixed: false,
+                    size: 10
+                });
+
+    });
+
+    function deletaindicador(button){
+		var confirmacao = confirm("você realmente deseja excluir esta linha?");
+		if(confirmacao == true){
+        $.ajax({url: "ajax/indicadorpdi/deletamapaindicador.php", type: 'POST', data: { codindicador: button.value, action : "D"}, success: function(data) {
+        	 $('div#message').html(data);
+        	 var teste = "#"+button.id;
+        	 teste = $(teste).parent().parent();
+        	 teste.remove();
+            }});
+		}
+}
+</script>
+<head>
+	<div class="bs-example">
+		<ul class="breadcrumb">
+			<li class="active"><a href="<?php echo Utils::createLink('mapaestrategico', 'listamapapdu'); ?>">Painel Tático</a> >> <a href="<?php echo Utils::createLink('indicadorpdi', 'consultaindicador'); ?>" >Indicadores Vinculados</a>  >> <a href="#" >Consulta Indicadores</a></li>  
+		</ul>
+	</div>
+</head>
+<body style="font-family: arial, helvetica, sans-serif; font-size: 14px;">
+    <h3>Consulta Indicadores</h3>
+    <hr style="border-top: 1px solid #0b559b;"/>
+ Objetivo:<?php echo $objobjetivo->getObjetivo(); ?>
+ 
+ 
+ <table  class="tablesorter-dropbox" >
+		
+			<tfoot>
+		        <tr>
+		            <th colspan="7" class="ts-pager form-horizontal">
+		                <button type="button" class="btn first"><i class="icon-step-backward glyphicon glyphicon-step-backward"></i></button>
+		                <button type="button" class="btn prev"><i class="icon-arrow-left glyphicon glyphicon-backward"></i></button>
+		                <span class="pagedisplay"></span> <!-- this can be any element, including an input -->
+		                <button type="button" class="btn next"><i class="icon-arrow-right glyphicon glyphicon-forward"></i></button>
+		                <button type="button" class="btn last"><i class="icon-step-forward glyphicon glyphicon-step-forward"></i></button>
+		                <select class="pagesize input-mini" title="Select page size">
+		                    <option selected="selected" value="10">10</option>
+		                    <option value="20">20</option>
+		                    <option value="30">30</option>
+		                    <option value="40">40</option>
+		                </select>
+		                <select class="pagenum input-mini" title="Select page number"></select>
+		            </th>
+		        </tr>
+		    </tfoot>
+		
+			<thead>
+				<tr>
+					<th>Indicador</th>
+					<th>Cesta de Indicadores</th>
+					<th>Editar</th>
+				    <th>Excluir</th>
+					<th>Vincular</th>
+					
+				</tr>
+			</thead>	
+			<tbody>
+			<?php for ($i = 0; $i < $cont3; $i++) { ?>
+                <tr>               
+                    <td><?php print ($objind[$i]->getNome()); ?></td>
+                    <td> <?php 
+                    switch ($objind[$i]->getCesta()){
+                    	case 0: print '-';
+                    	        break;
+                    	case 1: print 'PDI';
+                    	        break;
+                    	case 2: print 'Essencial';
+                    	        break;
+                    	case 3: print 'Opcional';
+                    	        break;
+                    	case 4: print 'PDU';
+                    	        break;
+                    }
+                    
+                    
+                    
+                   ?></td>
+                    <?php if (($objind[$i]->getCesta()<=3) && ($codUnidade==938)) {?>
+                    <td><a href="<?php echo Utils::createLink('indicadorpdi', 'editarindicador', array( 'ind'=> $objind[$i]->getCodigo())); ?>"><img src="webroot/img/editar.gif"/></a></td>
+                    <td><button style="border: none" onclick="deletaindicador(this)" id="<?php echo "btn{$i}"; ?>" value="<?php echo ($objind[$i]->getCodigo()); ?>"><img src ="webroot/img/delete.png"/></button></td>
+                    <td><a href="<?php echo Utils::createLink('indicadorpdi', 'vincularindicadorPdi', array( 'ind'=> $objind[$i]->getCodigo(), 'mapa'=> $codmapa,'des'=>'0')); ?>"><img width="30" height="30" src="webroot/img/maos.jpg"/></a></td>
+                   
+                   
+                    <?php } else {?>
+                    <td> 
+<?php if ($objind[$i]->getCesta()==4){?>
+<a href="<?php echo Utils::createLink('indicadorpdi', 'editarindicador', array( 'ind'=> $objind[$i]->getCodigo())); ?>"><img src="webroot/img/editar.gif"/></a>
+<?php } ?>
+</td>
+                     <td>
+<?php if ($objind[$i]->getCesta()==4){?>
+<button style="border: none" onclick="deletaindicador(this)" id="<?php echo "btn{$i}"; ?>" value="<?php echo ($objind[$i]->getCodigo()); ?>"><img src ="webroot/img/delete.png"/></button>
+<?php } ?>
+</td>
+                     <td>  
+                     
+                     <a href="<?php echo Utils::createLink('indicadorpdi', 'vincularindicador',
+                      array( 'ind'=> $objind[$i]->getCodigo(), 'mapa'=> $codmapa,'des'=>'0')); ?>">
+                      <img width="25" height="25" src="webroot/img/maos.png"/></a></td>
+                     
+                    <?php }?>
+               
+                </tr>
+            <?php } ?>
+				
+			</tbody>
+		</table>
+ 
+ 
+ 
+    <div class="incluir">
+    <input type="hidden" name="coddoc" value="<?php echo $coddoc; ?>" />
+	 	 <input type="hidden" name="codigo" value="<?php echo $codmapa; ?>" />
+     <a href="<?php echo Utils::createLink('indicadorpdi', 'incluiindicador'); ?>" >
+    <button  type="button" class="btn btn-primary btn">Incluir novo indicador</button></a> 
+      
+    
+    
+      
+    </div>
+</body>
+</html>
+
+
+

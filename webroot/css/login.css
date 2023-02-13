@@ -1,0 +1,62 @@
+
+
+
+
+#text {
+    width: 60%;
+    padding: 4%;
+    float: left;
+    background: #E8E8E8;
+    
+}
+
+#login {
+    /*height: 100%;*/
+    margin: 1% 0 0 2%;
+    width: 35%;
+    float: right;
+    border: ra;
+}
+
+#nav {
+    /*font-family: Verdana, Arial, Helvetica, sans-serif;*/
+    font-size: .8em;
+    font-weight: bold;
+    color: #222222;
+    margin: 0 0 0 2%;
+}
+
+ul.pdf {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 11px;
+    list-style: disc outside url("../img/pdf.png");
+}
+
+ul.contatos li a, ul.pdf li a {
+    text-decoration: none;
+}
+
+ul.contatos li {
+    list-style: none;
+    font-size: 13px;
+    font-weight: bold;
+}/*
+
+
+*/h1, h2 {
+    color: #828282;
+    text-shadow: 0px 1px rgba(0, 0, 0, 0.2);
+}/*
+
+*/p.product-text {
+    font-size: 14px;
+    color: #666666;
+    text-align: justify;
+    display: block;
+    line-height: 20px;
+}
+
+p.erro {
+    font-size: 12px;
+    color: #CD0000;
+}

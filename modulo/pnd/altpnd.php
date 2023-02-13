@@ -1,0 +1,63 @@
+<?php
+//require_once('../../includes/classes/sessao.php');
+//session_start();
+$sessao = $_SESSION["sessao"];
+$aplicacoes = $sessao->getAplicacoes();
+if (!$aplicacoes[27]) {
+    header("Location:index.php");
+}
+//$sessao = $_SESSION["sessao"];
+//$nomeunidade = $sessao->getNomeUnidade();
+//$codunidade = $sessao->getCodUnidade();
+//$responsavel = $sessao->getResponsavel();
+//$anobase = $sessao->getAnoBase();
+//require_once('../../includes/dao/PDOConnectionFactory.php');
+require_once('dao/pndDAO.php');
+require_once('classes/pnd.php');
+//require_once('../../includes/classes/curso.php');
+$codigo = $_POST["codigo"];
+$codcurso = $_POST["codcurso"];
+$nomecurso = $_POST["nomecurso"];
+if ($codigo != "" && is_numeric($codigo)) {
+    $curso = new Curso();
+    $curso->setCodcurso($codcurso);
+    $curso->setNomecurso($nomecurso);
+    $dao = new PndDAO();
+    $rows = $dao->buscacodigo($codigo);
+    $passou = false;
+    foreach ($rows as $row) {
+        $passou = true;
+        $curso->criaPnd($row['Codigo'], $row['Nopnd'], $row['Noatendidos'], $row['Ano']);
+    }
+    $dao->fechar();
+}
+//ob_end_flush();
+?>
+<form class="form-horizontal" name="pi" id="pi" method="post" action="<?php echo Utils::createLink('pnd', 'oppnd'); ?>">
+    <h3 class="card-title">Portadores de Necessidades Especiais</h3>
+    <div class="msg" id="msg"></div>
+
+    <table>
+        <tr>
+            <td width="300px">Curso</td>
+            <td><?php echo $nomecurso; ?></td>
+        </tr>
+        <tr>
+            <td width="300px">N&uacute;mero de discentes portadores de
+                necessidades especiais</td>
+            <td><input class="form-control"type="text" name="nopnd" maxlength="4" size="4" value="<?php print $curso->getPnd()->getNopnd(); ?>"/>
+            </td>
+        </tr>
+        <tr>
+            <td width="300px">N&uacute;mero de pessoas atendias por tecnologias
+                educacionais e sociais</td>
+            <td><input class="form-control"type="text" name="noatendidos" maxlength="4" value="<?php print $curso->getPnd()->getNoatendidos(); ?>"
+                       size="4" /></td>
+        </tr>
+    </table>
+    <input class="form-control"name="operacao" type="hidden" value="I" />
+    <input class="btn btn-info" type="submit"  value="Gravar" />
+    <input class="form-control"type="hidden"	name="codcurso" value="<?php print $codcurso ?>" />
+    <input	type="hidden" name="nomecurso" value="<?php print $nomecurso ?>" />
+
+</form>

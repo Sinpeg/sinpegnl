@@ -1,0 +1,128 @@
+<?php
+/* DAO */
+//require_once '../../../includes/dao/PDOConnectionFactory.php';
+//require_once '../../../includes/classes/sessao.php';
+//require_once '../../../includes/classes/unidade.php';
+//require_once '../dao/DocumentoDAO.php';
+//require_once '../dao/MapaDAO.php';
+//require_once '../dao/IndicadorDAO.php';
+//require_once '../dao/MetaDAO.php';
+///* Model */
+//require_once '../model/Documento.php';
+//require_once '../model/Mapa.php';
+//require_once '../model/Indicador.php';
+//require_once '../model/Meta.php';
+?>
+<?php
+
+$sessao = $_SESSION['sessao'];
+$codunidade = $sessao->getcodUnidade();
+$aplicacoes = $sessao->getAplicacoes(); // código das aplicações
+?>
+<?php
+if (!$aplicacoes[38]) {
+    print "Erro ao acessar esta aplicação";
+    exit();
+}
+?>
+<?php
+$codindicador = $_GET['ind'];
+$codmapa = $_GET['obj'];
+$coddoc = $_GET['doc'];
+
+$daodoc = new DocumentoDAO();
+$objdoc = new Documento();
+$rows = $daodoc->buscadocumento($coddoc);
+foreach ($rows as $row) {
+    if ($row['CodUnidade'] == $codunidade)
+        $objdoc->setCodigo($row['codigo']);
+}
+$daodoc->fechar();
+$daomapa = new MapaDAO();
+$objmapa = new Mapa();
+$rows = $daomapa->buscamapa($codmapa);
+foreach ($rows as $row) {
+    if ($row['CodigoDocumento'] == $objdoc->getCodigo()) {
+        $objmapa->setCodigo($row['Codigo']);
+        $objmapa->setDocumento($objdoc);
+    }
+}
+$daomapa->fechar();
+$daoind = new IndicadorDAO();
+$objind = new Indicador();
+$rows = $daoind->buscaindicador($codindicador);
+foreach ($rows as $row) {
+    if ($row['CodMapa'] == $objmapa->getCodigo() || $row['PropIndicador'] == $codunidade) {
+        $objind->setCodigo($row['Codigo']);
+        $objind->setIndicador($row['indicador']);
+        $objind->setCalculo($row['calculo']);
+        $objind->setValidade($row['validade']);
+        $objind->setMapa($objmapa);
+    }
+}
+if ($objind->getCodigo() == NULL) {
+    print "Erro: Indicador não encontrado.";
+    exit();
+}
+?>
+<fieldset>
+    <legend>Atualização de Indicadores</legend>
+    <form name="adicionar" method="POST" action="ajax/indicadorpdi/registraindicador.php">
+        <div id="resultado"></div>
+        <div>
+            <label>Indicador:</label>
+            <input type="text" class="txt" name="indicador" value="<?php print ($objind->getIndicador()); ?>" size="60"/>
+        </div>
+        <div>
+            <label>Documento: </label>
+            <select name="doc" id="doc-indicador" class="sel1">
+                <option value="0">Selecione o documento...</option>
+                <?php
+                $daodoc = new DocumentoDAO();
+                $rows = $daodoc->buscadocumentoporunidade($codunidade);
+                ?>
+                <?php foreach ($rows as $row) { ?>
+                    <option value="<?php print $row['codigo']; ?>" <?php
+                    if ($row['codigo'] == $objind->getMapa()->getDocumento()->getCodigo()) {
+                        print "selected";
+                    }
+                    ?>><?php print $row['nome']; ?></option>
+                        <?php } ?>
+                        <?php $daodoc->fechar(); ?>
+            </select>
+        </div>
+        <div class="unidade">
+            <label>Unidade acadêmica:</label>
+            <select name="unidade" class="sel1">
+                <option value="0">Selecione a unidade...</option>
+            </select>
+        </div>
+        <div class="objetivo">
+            <label>Objetivo: </label>
+            <select name="objetivo" class="sel1">
+                <option value="0">Selecione o objetivo estratégico...</option>
+                <?php
+                $daomapa = new MapaDAO();
+                $rows = $daomapa->buscamapadocumento($objind->getMapa()->getDocumento()->getCodigo());
+                ?>
+                <?php foreach ($rows as $row) { ?>
+                    <option value="<?php print $row['Codigo']; ?>" <?php
+                    if ($row['Codigo'] == $objind->getMapa()->getCodigo()) {
+                        print "selected";
+                    }
+                    ?>><?php print ($row['Objetivo']); ?></option>
+                        <?php } ?>
+                        <?php $daomapa->fechar(); ?>
+            </select>
+        </div>
+        <div>
+            <label>Fórmula para cálculo: </label>
+            <input type="text" class="txt" name="calculo" value="<?php print ($objind->getCalculo()); ?>" size="60" />
+        </div>
+        <input type="hidden" value="E" name="acao" />
+        <input type="hidden" name="codindicador" value="<?php print $codindicador ?>" />
+        <div>
+            <input type="button" value="salvar" name="salvar" class="btn btn-info"/>
+        </div>
+    </form>
+</fieldset>

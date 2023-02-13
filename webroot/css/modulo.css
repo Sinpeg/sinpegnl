@@ -1,0 +1,309 @@
+@-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.download{
+    margin:  10px auto;
+    align-items: center;
+    align-self: center;
+    text-align: center;
+}
+
+.download a::before{
+    content: '\f0c7';
+    font-family: "Font Awesome 5 free"; 
+    font-weight: 400;
+    padding: 5px;
+}
+
+.download ul {
+    text-decoration: none;
+    list-style: none;
+}
+
+.card-body{
+    margin: 10px auto;
+    
+}
+
+/* ### Geral formulários ### */
+.coluna1{
+    font-weight: 700;
+    line-height: 1.5;
+    padding-top: calc(.375rem + 1px);
+    padding-bottom: calc(.375rem + 1px);
+    font-size: inherit;
+}
+
+/*.
+    text-align: left;
+    width: 100%;
+    vertical-align: middle;
+    font-weight: bold;
+    text-align: center;
+}
+
+.coluna2{
+    margin: auto;
+    padding: 5px;
+    height: 15px;
+    vertical-align: middle;
+    font-weight: bold;
+}
+
+.coluna2 input,
+.coluna2 select,
+.coluna2 input:disabled,
+.coluna2 select:disabled{
+    border-bottom: 3px;
+    border-style: none;
+    border-bottom-style: solid;
+    width: 100%;
+    background-color: transparent;
+}*/
+
+thead { 
+    text-align: center;
+}
+/* ### Geral botões -- precisa padronizar### */
+
+.btn-primary, .btn-primary.active, .btn-primary.hover, .btn-primary.disabled{
+    border-color: #343a40d4;
+    background-color: #343a40;
+    position: static;
+    align-self: center;
+}
+
+/* ### Geral classes ### */
+
+#modalLoading {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.loader {
+  left:50%;
+  position:absolute;
+  top:40%;
+  left:45%;	
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 100px;
+  height: 100px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+.content-wrapper{
+    background-image: linear-gradient(#ffffff, #e9ecef);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+a {
+    background-color: transparent;
+    color: #212529;
+    text-decoration: none;
+}
+
+a:active,
+a:hover {
+    color: #9b9b9b;
+    outline: 0;
+}
+
+.bs-example{
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+}
+
+/* ### Módulo unidade ### */
+
+#unid-list1{
+    text-align:center;
+    float:left;
+    list-style:none;
+    margin-top:-3px;
+    padding:0;
+    position: absolute;
+    height: 50px;
+}
+
+#unid-list1 li{
+    padding: 5px;
+    background: #f0f0f0;
+    border-bottom: #bbb9b9 1px solid;
+}
+
+#unid-list1 li:hover{
+    background: #d5d6d8;
+    cursor: pointer;
+}
+
+#unid-list{
+    float:left;
+    list-style:none;
+    margin-top:-3px;
+    padding:0;
+    width:20%;
+    position: absolute;
+    height: 50px;
+}
+
+#unid-list li{
+    padding: 5px; 
+    background: #f0f0f0; 
+    border-bottom: #bbb9b9 1px solid;
+}
+
+#unid-list li:hover{
+    background:#e9ecef;
+    cursor: pointer;
+}
+
+/* ### Módulo curso ### */
+#curso-list{
+    float:left;
+    list-style:none;
+    margin-top:-3px;
+    padding:0;
+    width:520px;
+    position: absolute;
+    height: 50px;
+}
+
+#curso-list li{
+    padding: 5px;
+    background: #f0f0f0; 
+    border-bottom: #bbb9b9 1px solid;
+}
+
+#curso-list li:hover{
+    background:#059c8ce6;
+    cursor: pointer;
+}
+
+#cxcurso{
+    padding: 5px;
+    border: #000000 1px solid;
+    border-radius:4px;
+    width: 520px;
+    height: 25px;
+}
+
+/* ### Módulo raa ###*/
+#accordion, #sub-caixa{
+    padding-bottom: 5%;
+    padding-left: 5%;
+    padding-right: 5%;
+}
+
+form #fmr{
+    padding-top: 5%;
+    padding-bottom: 5%;
+    padding-left: 10%;
+    padding-right: 10%;
+}
+
+/* ### Módulo dashboard ###*/
+
+.card-info{
+    width: 60%;
+    margin: auto;
+}
+/*
+.card{
+    position: relative;
+    margin:auto;
+    display: flex;
+}
+
+@-moz-document url-prefix(){
+    .card {
+        /* Add shadows to create the "card" effect *//*
+        text-align: center;
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+        transition: 0.3s;
+        width: 100%;
+        height: 200.em;
+        position: relative;
+    }
+}
+
+.card:not(:has(.coluna1)) {
+    /* Add shadows to create the "card" effect *//*
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    width: 100%;
+    height: 200.em;
+    position: relative;
+}
+
+.card:has(.coluna1){
+    /* Add shadows to create the "card" effect *//*
+    text-align: center;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    width: 60%;
+    height: 200.em;
+    position: relative;
+}
+
+.card1, .card2, .card3{
+    /* Add shadows to create the "card" effect *//*
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    width: 100%;
+    background-color: #fff;
+    position:relative;    
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.card3 select{
+    border-bottom: 3px;
+    border-style: none;
+    border-bottom-style: solid;
+    background-color: transparent;
+}
+*/
+/* On mouse-over, add a deeper shadow *//*
+.card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+.card-header {
+    margin: 0;
+    background-color: #eceff1;
+}
+
+#piechart {
+    width: 100%;
+}
+
+#piechart2 {
+    width: 100%;
+}
+
+#redigirRaa{
+    padding-top: 1%;
+    padding-bottom: 1%;
+    padding-left: 1%;
+    padding-right: 1%;
+}

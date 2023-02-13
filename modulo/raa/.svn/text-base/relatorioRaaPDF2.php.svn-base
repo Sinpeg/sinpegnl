@@ -1,0 +1,90 @@
+<?php
+//Exibir Erros
+ini_set('display_errors',1);
+ini_set('display_startup_erros',1);
+error_reporting(E_ALL);
+
+include 'funcoesraa.php';
+
+require_once '../../classes/sessao.php';
+require_once '../../dao/PDOConnectionFactory.php';
+require_once '../../vendors/dompdf/autoload.inc.php';
+require_once 'classes/topico.php';
+require_once 'classes/texto.php';
+require_once 'classes/modelo.php';
+require_once '../../classes/unidade.php';
+require_once 'dao/topicoDAO.php';
+require_once 'dao/textoDAO.php';
+require_once 'dao/modeloDAO.php';
+
+$codunidade = $_GET['codunidade'];
+$anobase = $_GET['ano'];
+
+$lista = array();
+$cont = 0;
+$html = "";
+
+$mdao= new ModeloDAO();
+
+$dao = new TextoDAO();   
+$rowsl = $dao->buscaTopicosPreenchidos_Pendentes($anobase, $codunidade);
+$topico=array();    
+$topico=incluirTopicoNoTexto($rowsl,$topico,$cont,$codunidade,$anobase);
+$rowsl = $dao->buscaSubTopicosPreenchidos_Pendentes($anobase, $codunidade);
+$topico=incluirTopicoNoTexto($rowsl,$topico,$cont,$codunidade,$anobase);
+$aux = 0;
+
+
+
+if (count($topico)>0)  {
+	  $anterior=NULL; 
+	  foreach ($topico as $t){
+	  	 
+		  	 $trows = $dao->buscaTexto($t->getCodigo(), $anobase, $codunidade);
+		     $codtexto='';
+		  	 $passou=0;
+		   	
+		  	 if($aux !=0 ){
+		  	 	$html .= '<div style="display: block; page-break-before: always;"></div>';
+		  	 	$html .= '<h3 >'.$t->getNivel().$t->getNome().'</h3>';
+		  	 	
+		  	 }
+		  	 $aux =1;
+			 foreach ($trows as $r){			 	
+			  	$html .= $r['texto'];
+			  	$codtexto=$r['codigo'];
+			  	$passou=1;		  	
+			  	
+			 }			  
+		
+			 if ($t->getSubtopicos()!=NULL){
+			 	   $html .= subtopicoArquivo($t->getSubtopicos(),$codunidade,$anobase);
+			 }else if($passou==0){
+			 	$html .= "Não se aplica!";
+			 }	  	  	
+	     }
+	  }
+
+//$html = '<div style="display: block; page-break-before: always;"></div>'; //Quebra de Página
+
+//echo $html;
+
+
+// reference the Dompdf namespace
+use Dompdf\Dompdf;
+
+// instantiate and use the dompdf class
+$dompdf = new Dompdf();
+
+$dompdf->loadHtml($html);
+
+// (Optional) Setup the paper size and orientation
+$dompdf->setPaper('A4', 'portrait');
+
+// Render the HTML as PDF
+$dompdf->render();
+
+// Output the generated PDF to Browser
+$dompdf->stream('Relatorio Atividades.pdf');
+
+?>

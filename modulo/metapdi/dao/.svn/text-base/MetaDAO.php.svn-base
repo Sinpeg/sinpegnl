@@ -1,0 +1,249 @@
+<?php
+
+class MetaDAO extends PDOConnectionFactory {
+
+    public $conex = null;
+/*
+    public function MetaDAO() {
+        $this->conex = PDOConnectionFactory::getConnection();
+    }
+*/
+public function insere($meta) {
+        try {
+            $sql = "INSERT INTO `meta` (`CodMapaInd`, `codCalendario` ,`periodo`, `meta`, `ano`,`metrica`,`cumulativo`) VALUES (?,?,?,?,?,?,?)";
+            $stmt = parent::prepare($sql);
+            parent::beginTransaction();
+            $stmt->bindValue(1, $meta->getMapaindicador());
+            $stmt->bindValue(2, $meta->getCalendario());
+            $stmt->bindValue(3, $meta->getPeriodo());
+            $stmt->bindValue(4, $meta->getMeta());
+            $stmt->bindValue(5, $meta->getAno());
+            $stmt->bindValue(6, $meta->getMetrica());
+            $stmt->bindValue(7, $meta->getCumulativo());            
+            $stmt->execute();
+            parent::commit();
+        } catch (PDOException $ex) {
+//            parent::rollback();
+            print "Erro: Código:" . $ex->getCode() . " Mensagem" . $ex->getMessage();
+        }
+    }
+
+    public function altera(Meta $meta) {
+        try {
+            $sql = "UPDATE `meta` SET `CodigoIndicador`=?, 
+                `periodo`=?,`meta`=?, `ano`=?, `metrica`=?, `cumulativo`=? WHERE `Codigo`=?";
+            $stmt = parent::prepare($sql);
+            parent::beginTransaction();
+            $stmt->bindValue(1, $meta->getIndicador()->getCodigo());      
+//            print " Código do indicador: ". $meta->getIndicador()->getCodigo();
+//            exit;
+            $stmt->bindValue(2, $meta->getPeriodo());
+            $stmt->bindValue(3, $meta->getMeta());
+            $stmt->bindValue(4, $meta->getAno());
+            $stmt->bindValue(5, $meta->getMetrica());
+            $stmt->bindValue(6, $meta->getCumulativo());
+            $stmt->bindValue(7, $meta->getCodigo());
+            $stmt->execute();
+            parent::commit();
+        } catch (PDOException $ex) {
+            parent::rollback();
+            print "Erro: Código:" . $ex->getCode() . "Mensagem" . $ex->getMessage();
+        }
+    }
+
+   
+
+    
+ public function insereAlll($arraymeta) {
+    	try {
+    		
+    		parent::beginTransaction();
+    		foreach ($arraymeta as $m){
+    			$sql = "INSERT INTO `meta` (`CodMapaInd`, `codCalendario` ,`periodo`, `meta`, `ano`,`metrica`) VALUES (?,?,?,?,?,?)";
+    			
+	    		$stmt = parent::prepare($sql);
+	    	//	echo $m->getMapaindicador()->getCodigo().",".$m->getCalendario()->getCodigo().",".$m->getPeriodo().",".$m->getMeta().",".
+	    	//	$m->getMetrica().",".$m->getAno();
+	    		$stmt->bindValue(1, $m->getMapaindicador()->getCodigo());
+
+	    	    $stmt->bindValue(2, $m->getCalendario()->getCodigo());
+	    		$stmt->bindValue(3, $m->getPeriodo());
+	    		$stmt->bindValue(4, $m->getMeta());
+	    		$stmt->bindValue(5, $m->getAno());
+	    		$stmt->bindValue(6, $m->getMetrica());
+	    	   //$stmt->bindValue(7, NULL);
+	    		$stmt->execute();
+    		
+    		}
+    		parent::commit();
+    	} catch (PDOException $ex) {
+    		//            parent::rollback();
+    		print "Erro insereAlll:" . $ex->getCode() . " Mensagem" . $ex->getMessage();
+    	}
+    }
+    
+    public function updateAlll($arraymeta) {
+    	try {
+    		parent::beginTransaction();
+    
+    		foreach ($arraymeta as $meta){
+    			 
+    			$sql = "UPDATE `meta` SET `CodMapaInd`=?, codCalendario = ?, `periodo`=?,`meta`=?, `ano`=?, `metrica`=? WHERE `Codigo`=?";
+    			$stmt = parent::prepare($sql);
+    			$stmt->bindValue(1, $meta->getMapaindicador()->getCodigo());
+    			$stmt->bindValue(2, $meta->getCalendario()->getCodigo());
+    			$stmt->bindValue(3, $meta->getPeriodo());
+    			$stmt->bindValue(4, $meta->getMeta());
+    			$stmt->bindValue(5, $meta->getAno());
+    			$stmt->bindValue(6, $meta->getMetrica());
+    			$stmt->bindValue(7, $meta->getCodigo());
+    			$stmt->execute();
+    
+    		}
+    		parent::commit();
+    	} catch (PDOException $ex) {
+    		//            parent::rollback();
+    		print "Erro: Código:" . $ex->getCode() . " Mensagem" . $ex->getMessage();
+    	}
+    }
+    
+    
+    public function deleta($codigo) {
+        try {
+            parent::beginTransaction();
+            $stmt = parent::prepare("DELETE FROM `meta` WHERE `Codigo`=?");
+            $stmt->bindValue(1, $codigo);
+            $stmt->execute();
+            parent::commit();
+        } catch (PDOException $ex) {
+            print "Erro: " . $ex->getCode() . " " . $ex->getMessage();
+        }
+    }
+
+    
+        public function deletaAll($arraymeta) {
+        	try {
+    		parent::beginTransaction();
+    
+    		foreach ($arraymeta as $meta){
+    			 
+    			$sql = "DELETE FROM `meta` WHERE `Codigo`=?";
+    			$stmt = parent::prepare($sql);
+    				$stmt->bindValue(1, $meta->getCodigo());
+    			$stmt->execute();
+    
+    		}
+    		parent::commit();
+    	} catch (PDOException $ex) {
+    		//            parent::rollback();
+    		print "Erro em deletaAll(meta):" . $ex->getCode() . " Mensagem" . $ex->getMessage();
+    	}
+       }
+    
+    
+  public function buscaMetaResultadoporCodMapaIndiOnly($codMapaIndicador){
+    	try {
+    		$sql = "SELECT * FROM `meta` WHERE `codMapaInd`= :codmi ";
+    		$stmt = parent::prepare($sql);
+    		$stmt->execute(array(':codmi' => $codMapaIndicador));
+    		return $stmt;
+    	} catch (PDOException $ex) {
+    		echo "Erro: buscaMetaResultadoporCodMapaIndiOnly " . $ex->getMessage();
+    	}
+    }
+
+public function buscaMetaResultadoporCodMapaIndiResult($codMapaIndicador,$anoinicial,$anofinal){
+    	try {
+    		$sql = "SELECT * FROM `meta` me JOIN `resultados_pdi` re ON(me.Codigo = re.CodMeta) WHERE `codMapaInd`= :codmi
+    		and me.ano>=:ai and me.ano<=:af ";
+    		$stmt = parent::prepare($sql);
+    		$stmt->execute(array(':codmi' => $codMapaIndicador, ':ai'=>$anoinicial,':af'=>$anofinal));
+    		return $stmt;
+    	} catch (PDOException $ex) {
+    		echo "Erro buscaMetaResultadoporCodMapaIndi: " . $ex->getMessage();
+    	}
+    }
+
+    public function lista() {
+        try {
+            $stmt = parent::query("SELECT * FROM `meta` ORDER BY `CodigoIndicador`, `ano`");
+            return $stmt;
+        } catch (PDOException $ex) {
+            print "Erro: " . $ex->getCode() . " " . $ex->getMessage();
+        }
+    }
+
+    public function buscarmeta($codigo) {
+        try {
+            $sql = "SELECT * FROM `meta` WHERE `Codigo`= :codigo ORDER BY  `ano`";
+            $stmt = parent::prepare($sql);
+            $stmt->execute(array(':codigo' => $codigo));
+            return $stmt;
+        } catch (PDOException $ex) {
+            echo "Erro buscarmeta: " . $ex->getMessage();
+        }
+    }
+
+    public function buscarmetaindicador($codmapind,$codcal) {
+        try {
+            $sql = "SELECT `Codigo`, `CodMapaInd`, `codCalendario`, `periodo`, `meta`,".
+                " `ano`, `metrica`, `cumulativo` ".
+                "  FROM `meta`".
+                " WHERE `CodMapaInd`=:codindmap and `codCalendario`=:codcal";
+            $stmt = parent::prepare($sql);
+            $stmt->execute(array(':codindmap' => $codmapind,':codcal'=>$codcal));
+            return $stmt;
+        } catch (PDOException $ex) {
+            echo "Erro buscarmetaindicador: " . $ex->getMessage();
+        }
+    }
+    public function buscarmetaParaCalendario($codcal) {
+        try {
+            $sql = "SELECT * FROM `meta` WHERE `codCalendario`= :codigo ";
+            $stmt = parent::prepare($sql);
+            $stmt->execute(array(':codigo' => $codcal));
+            return $stmt;
+        } catch (PDOException $ex) {
+            echo "Erro: " . $ex->getMessage();
+        }
+    }
+
+	public function buscaMetaResultadoporCodMapaIndi($codMapaIndicador){
+    	try {
+    		$sql = "SELECT * FROM `meta` me JOIN `resultados_pdi` re ON(me.Codigo = re.CodMeta) WHERE `codMapaInd`= :codmi ";
+    		$stmt = parent::prepare($sql);
+    		$stmt->execute(array(':codmi' => $codMapaIndicador));
+    		return $stmt;
+    	} catch (PDOException $ex) {
+    		echo "Erro buscaMetaResultadoporCodMapaIndi: " . $ex->getMessage();
+    	}
+    }
+    
+    public function buscarmetamapaindicador($codMapaIndicador,$ano) {
+    	try {
+    		$sql = "SELECT * FROM `meta` WHERE `CodMapaInd`= :codigo  and `ano` = :ano";
+    		$stmt = parent::prepare($sql);
+    		$stmt->execute(array(':codigo' => $codMapaIndicador,':ano'=>$ano));
+    		return $stmt;
+    	} catch (PDOException $ex) {
+    		echo "Erro buscarmetamapaindicador: " . $ex->getMessage();
+    	}
+    }
+
+   public function buscarmetamapaindicadorperiodo($codMapaIndicador) {
+    	try {
+    		$sql = "SELECT * FROM `meta` WHERE `CodMapaInd`= :codigo ";
+    		$stmt = parent::prepare($sql);
+    		$stmt->execute(array(':codigo' => $codMapaIndicador));
+    		return $stmt;
+    	} catch (PDOException $ex) {
+    		echo "Erro buscarmeta: " . $ex->getMessage();
+    	}
+    }
+    public function fechar() {
+        PDOConnectionFactory::Close();
+    }
+
+}
+
+?>

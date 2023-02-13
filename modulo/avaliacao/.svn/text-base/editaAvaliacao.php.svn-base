@@ -1,0 +1,165 @@
+<?php
+
+require_once MODULO_DIR . 'documentopdi/classe/Documento.php';
+require_once MODULO_DIR . 'documentopdi/dao/DocumentoDAO.php';
+$sessao = $_SESSION['sessao'];
+$codunidade = $sessao->getCodUnidade();
+$aplicacoes = $sessao->getAplicacoes();
+?>
+<?php
+if (!$aplicacoes[36]) {
+    print "Erro ao acessar esta aplicação";
+    exit();
+}
+?>
+<?php
+
+$daodocumento = new DocumentoDAO();
+$documento = $daodocumento->buscadocumentoporunidadePeriodoSemPDI($sessao->getCodUnidade(), $sessao->getAnobase())->fetch();
+
+$daoAvaliacaofinal = new AvaliacaofinalDAO();
+$arrayAvalfin = $daoAvaliacaofinal->buscaArquivoAvalCodDoc($documento['codigo'],$sessao->getAnobase());
+var_dump($arrayAvalfin);die;
+if($arrayAvalfin->num_rows > 0 AND $arrayAvalfin->num_rows < 2){
+	$edicao = 1;
+	$arrayAvalfin = $arrayAvalfin->fetch_assoc();
+	$nomearq = $arrayAvalfin['nomearq'];
+	$codigoaval = $arrayAvalfin['codigo'];
+	$avaliacao = $arrayAvalfin['avaliacao'];
+
+}else if($arrayAvalfin->num_rows > 1){
+	echo "erro";	die;
+}else{
+	$edicao = 0;
+}
+
+$daodoc = new DocumentoDAO();
+
+$codunidade = $sessao->getCodUnidade();
+$rowsdoc = $daodoc->buscadocumentoporunidade($codunidade);
+
+?>
+    
+<script language="JavaScript">
+
+	function direciona() {
+	    var erro=false;
+	          
+	    var extensoesOk = ",.rar,.zip,";
+	    var extensao = "," + document.adicionar.userfile.value.substr(document.adicionar.userfile.value.length - 4).toLowerCase() + ",";
+	    var conceptName = $('#documentoAval').find(":selected").text();
+		if(conceptName=="Selecione o documento..."){
+	        document.getElementById('msg').innerHTML = "Selecione um documento!";
+	        erro= true;
+		}else if (document.adicionar.avaliacaofinal.value == ""){
+	        document.getElementById('msg').innerHTML = "Informe sua avaliacão final!";
+	        erro=true ;
+	    }else if (document.adicionar.userfile.value == "")
+	    {
+	        document.getElementById('msg').innerHTML = "O campo do arquivo est&aacute; vazio!!";
+	        erro= true;
+	    }
+	    else if (extensoesOk.indexOf(extensao) == -1)
+	    {
+	        alert(extensao);
+	        document.getElementById('msg').innerHTML = "Envie arquivos compactados (extens&atilde;o .rar ou .zip).";
+	        erro=true ;
+	    Nome
+	    }
+	    
+	
+	
+	    if (!erro){
+	        document.getElementById('adicionar').action = "?modulo=avaliacao&acao=gravaAvaliacaofinal";
+	        document.getElementById('adicionar').submit();
+	    }
+	    
+	}
+
+</script>
+
+  <div id="msg"></div>
+
+<form enctype="multipart/form-data" name="adicionar" id="adicionar" method="POST" >
+    <fieldset>
+        <legend>Registrar / Editar Avaliação</legend>
+        <div id="resultado"></div>
+	 		
+        <input type="hidden" value="E" name="op" />
+	 		
+	 	<div id="tabela">	
+	        <table>
+			       		<tr>
+			        			<td>
+					            	<label>Documento: </label>
+					            </td>
+					            <td>
+						            <select name="codDocumento" id="documentoAval" class="sel1">
+						                <option value="0" >Selecione o documento...</option>
+						                <?php foreach ($rowsdoc as $row) : ?>
+						                	<?php $ano = $row['anoinicial']; ?>
+						                	<option onclick="verificaAvaliacao(this);" value=<?php print $row["codigo"]; ?>  <?php if($row['codigo'] == $codDocumento){print 'selected';}?>><?php print $row['nome'] ?><?php print ' (' . $row['anoinicial'] . '-' . $row['anofinal'] . ')'; ?></option>
+						                <?php endforeach; ?>
+						            </select><br>
+						        </td>
+					</tr>
+			        
+			             
+				        <tr>
+				            <td><label>Avaliação Final</label></td>
+				            <td><textarea id="area" class="area" name="avaliacaofinal" rows="10" cols="50"><?php print $avaliacao; ?></textarea></td>
+				        </tr>
+				           
+				           
+				        <tr>                     
+				          <td><label>Ata Avaliacao</label></td>
+				          <td>
+				          	  <input type="file"  name="userfile" id="userfile" />
+				              <input type="hidden" name="MAX_FILE_SIZE" value="10485760">
+						  </td>
+				        </tr>
+				       
+				       <?php if($edicao == 1){?>
+				       <tr> 
+				       		<td><input type ="hidden" name ="userlink" value="true"/></td>                    
+							<td><label>Exportar arquivo</label>
+							
+								<?php print $nomearq; ?>
+								<a  href="<?php echo Utils::createLink('avaliacao', 'download', array('codigo' =>$codigoaval)); ?>"	target="_self"><img  src="webroot/img/download.jpg"  alt="Download" width="19" height="19" /> </a>
+							</td>
+					   </tr>  
+					   <?php }else{ ?>
+					   <tr>
+					   		<td>
+								<input type ="hidden" name ="userlink" value="false"/>
+							</td>
+						</tr>
+						<?php }?>
+			</table>
+			 <input type="hidden" value="<?php if($edicao == 1){print "editar";}else{print "gravar";}?>" name="funcao" />
+	        <div>
+            	<input type="button" value="<?php if($edicao == 1){ print "Atualizar"; }else{ print "Gravar";}?>" onclick="direciona(1);" name="salvarr" class="btn btn-info"/>
+        	</div>
+	    </div>
+	       
+
+
+
+    </fieldset>
+    
+</form>
+
+
+ <script>
+
+	function verificaAvaliacao(documento){
+    	
+		 $("#tabela").empty();
+	        $.ajax({url: "ajax/avaliacaofinal/ajaxAvaliacao.php", type: 'POST', data:{codDocumento:documento.value}, success: function(result){
+	            $("#tabela").html(result);
+	        }});
+		 
+	      
+	}
+
+    </script>

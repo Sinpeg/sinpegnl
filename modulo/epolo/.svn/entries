@@ -1,0 +1,82 @@
+8
+
+dir
+57
+http://10.1.19.179/svn/sisraa_repositorio/sisraa/sistema/modulo/epolo
+http://10.1.19.179/svn/sisraa_repositorio
+
+
+
+2018-10-09T17:18:45.109520Z
+57
+dinfi
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+f459bd6a-6f71-459b-a450-08f2ec089600
+
+altpolo.php
+file
+
+
+
+
+2018-10-10T16:52:25.000000Z
+8c667a652f7f335708b6e606a7a5a279
+2018-10-09T13:34:51.276682Z
+56
+dinfi
+
+classes
+dir
+
+consultapolo.php
+file
+
+
+
+
+2018-10-10T16:52:25.000000Z
+02279d7d8108cb0a3bea8166fdfed326
+2018-10-09T17:18:45.109520Z
+57
+dinfi
+
+dao
+dir
+
+incluipolo.php
+file
+
+
+
+
+2018-10-10T16:52:25.000000Z
+3a2962524b79680fb208a9613232bafa
+2018-10-09T13:34:51.276682Z
+56
+dinfi
+
+oppolo.php
+file
+
+
+
+
+2018-10-10T16:52:25.000000Z
+d7389474fc07484f78013366fba6b6ce
+2018-10-09T13:34:51.276682Z
+56
+dinfi
+

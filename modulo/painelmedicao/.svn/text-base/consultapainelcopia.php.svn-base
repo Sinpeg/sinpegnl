@@ -1,0 +1,369 @@
+<?php
+
+
+if (!isset($_SESSION["sessao"])) {
+	exit();
+}
+$anobase = $_SESSION['sessao']->getAnobase();
+
+///* Consultas */
+$daodoc = new DocumentoDAO();
+$rows = $daodoc->buscadocumento(addslashes($_GET['coddoc']));
+$objdoc = new Documento();
+foreach ($rows as $row) {
+   
+        $objdoc->setCodigo($row['codigo']);
+        $objdoc->setNome($row['nome']);
+        $objdoc->setAnoInicial($row['anoinicial']);
+        $objdoc->setAnoFinal($row['anofinal']);
+        $objdoc->setMissao($row['missao']);
+        $objdoc->setVisao($row['visao']);    
+}
+
+$objcal=new Calendario();
+$daocal=new CalendarioDAO();
+
+$rows=$daocal->buscaCalendarioporAnoBaseOnly($anobase);
+
+foreach ($rows as $r){
+	$objcal->setCodigo($r['codCalendario']);
+}
+
+$cont = 0;
+$daomapa = new MapaDAO();
+$rows = $daomapa->lista();
+$objmapa = array();
+foreach ($rows as $row) {
+    if ($objdoc->getCodigo() == $row['CodDocumento']) {
+    	
+        $objmapa[$cont] = new Mapa();
+        $daoObjetivo = new ObjetivoDAO();
+        $arrayObjetivo = $daoObjetivo->buscaobjetivo($row['codObjetivoPDI'])->fetch();
+        $objetivo = new Objetivo();
+        $objetivo->_construct($arrayObjetivo['Codigo'], $arrayObjetivo['Objetivo'], $arrayObjetivo['DescricaoObjetivo']);
+        $objmapa[$cont]->setObjetivoPDI($objetivo);
+        $objmapa[$cont]->setDocumento($objdoc);
+        $objmapa[$cont]->setCodigo($row['Codigo']);
+        //echo $objmapa[$cont]->getCodigo()."-".$_GET['indicador']."<br>";
+        $cont++;
+    }
+}
+$mapaindicador = new Mapaindicador();
+$daomapaindicador = new MapaIndicadorDAO();
+$daoind = new IndicadorDAO();
+$rows = $daoind->selectIndicadorByCodMapa1(addslashes($_GET['indicador']));
+$objetoind = new Indicador();
+ $indicemapa=-1;
+foreach ($rows as $row) {
+	//echo "passou1";
+    $objetoind->setCodigo($row['codIndicador']);
+    $objetoind->setNome($row['nome']);
+    $objetoind->setCalculo($row['calculo']);
+	$mapaindicador->setIndicador($objetoind);
+	for ($i=0;$i<count($objmapa);$i++){
+		
+		if ($objmapa[$i]->getCodigo()==$row['codMapa']){
+		   $mapaindicador->setMapa($objmapa[$i]);
+		   $objmapa[$i]->setMapaindicador($mapaindicador);
+		   $indicemapa=$i;
+		  // echo "passou";
+		}
+	}
+    $mapaindicador->setCodigo($row['codigo']);
+    $mapaindicador->setPropindicador($row['PropIndicador']);
+}
+
+$daocalendario = new CalendarioDAO();
+$daometa = new MetaDAO();
+$objetometa = new Meta();
+$arraycal = $daocalendario->buscaCalendarSomenteioPorAnoBase($anobase);
+foreach ($arraycal as $r) {
+	$cal=$r['codCalendario'];
+}
+
+
+$arraymetas = $daometa->buscarmetaindicador($objmapa[$indicemapa]->getMapaindicador()->getCodigo(),$cal);
+	foreach ($arraymetas as $arraymeta){
+	    if ($arraymeta['ano'] == $anobase) {
+    	
+	        $objetometa->setMeta($arraymeta['meta']);
+	        $objetometa->setPeriodo($arraymeta['periodo']);
+	        $objetometa->setMetrica($arraymeta['metrica']);
+	        $objetometa->setMapaindicador($mapaindicador);
+	        $objetometa->setCodigo($arraymeta['Codigo']);
+	        $objetometa->setCumulativo($arraymeta['cumulativo']);
+	    }
+	}
+
+$daores = new ResultadoDAO();
+//echo "codigo meta".$objetometa->getCodigo();
+$rows = $daores->buscaresultadometa($objetometa->getCodigo());
+$objres = array();
+$cont1 = 0; // contador dos resultados
+//echo $cont1;
+foreach ($rows as $row) {
+    $objres[$cont1] = new Resultado();
+    $objres[$cont1]->setMeta($objetometa);
+    $objres[$cont1]->setMetaAtingida($row['meta_atingida']);
+    $objres[$cont1]->setAnaliseCritica($row['analiseCritica']);
+    $objres[$cont1]->setPeriodo($row['periodo']);
+    $cont1++;
+}
+?>
+
+<script>
+    $(function() {
+        $('#accordion').accordion(function() {
+        });
+    });
+</script>
+
+<?php
+switch ($objetometa->getPeriodo()) {
+    case 'A':
+        $periodo = array('Ano de ' . $anobase);
+        break;
+    case 'T':
+        $periodo = array('1º trimestre', '2º trimestre', '3º trimestre',
+            '4º trimestre');
+        break;
+    case 'M':
+        $periodo = array('janeiro', 'fevereiro', 'março', 'abril', 'maio',
+            'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro',
+            'dezembro');
+        break;
+    case 'S':
+        $periodo = array('1º semestre', '2º semestre');
+        break;
+    case 'P':
+        $periodo = array('Parcial', 'Final');
+        break;
+}
+?>
+
+<head>
+	<div class="bs-example">
+		<ul class="breadcrumb">
+		    <li>
+			    <form method="post" action="<?php print Utils::createLink('painelmedicao', 'painelmed') ?>">
+	            	<input type="hidden" name="codDocumento" value="<?php print ($objdoc->getCodigo()); ?>">
+	            	<input style="border: inherit; background: inherit;" type="submit" name="teste" value="Painel de Medição" />
+	            </form>
+		    </li>
+			<li class="active">Consulta</li>  
+		</ul>
+	</div>
+</head>
+
+
+<div id="pdi-resumo">
+    <p>Documento:<?php print $objdoc->getNome(); ?></p>
+    <p>Objetivo Estratégico: <?php  print $objmapa[$indicemapa]->getObjetivoPDI()->getObjetivo(); ?> </span></p>
+    <p>Indicador: <?php print ($objmapa[$indicemapa]->getMapaindicador()->getIndicador()->getNome()); ?></p>
+    <p>Meta:<?php print ($objetometa->getMeta()); ?></p>
+    <p>Métrica:<?php print (($objetometa->getMetrica() == "Q") ? ("Absoluto") : ("Percentual")); ?></p>
+<p>Forma de Cálculo:<?php print ($objmapa[$indicemapa]->getMapaindicador()->getIndicador()->getCalculo()); ?></p>
+</div>
+<?php if ($cont1==0) { ?>
+    <div class="ui-widget">
+        <div class="ui-state-highlight ui-corner-all" style="padding: 0 .7em;">
+            <p>
+                <span class="ui-icon ui-icon-alert" 
+                      style="float: left; margin-right: .3em;"></span>
+                <strong>Importante:</strong> Não há resultados cadastrados para este indicador no ano de <?php echo $anobase; ?>.
+            </p>
+            <p><strong>Indicador: </strong><?php echo ($objetoind->getNome()); ?></p>
+            <form method="post" action="<?php print Utils::createLink('painelmedicao', 'painelmed') ?>">
+	            	<input type="hidden" name="codDocumento" value="<?php print ($objdoc->getCodigo()); ?>">
+	            	<input class="btn btn-info" style="border: inherit;" type="submit" name="teste" value="Voltar" />
+	        </form>
+        </div>
+    </div>
+<?php } else {?>
+<div id="accordion">
+<?php
+$total=0;
+for ($i = 0; $i < count($periodo); $i++) { 
+        $daores = new ResultadoDAO();
+        $analise = null;
+        $rows = $daores->buscaresultadometa1($objetometa->getCodigo(), ($i + 1));
+        if ($rows->rowCount() == 0) {
+            $meta_atingida[$i] = "-";
+        } else {
+            foreach ($rows as $row) {
+                $meta_atingida[$i] = $row['meta_atingida'];
+                $analise = $row['analiseCritica'];
+            }
+        
+				        $total += ($meta_atingida[$i] == '-') ? (0) : ($meta_atingida[$i]);
+				        $total_array[$i] = $total;
+				        /** Procura a situação da meta* */
+				        $meta = $objetometa->getMeta();
+				        if ($meta != 0) {
+				            if ($objetometa->getCumulativo() == "1") {
+				                $valor_referencia = $total_array[$i];
+				            } else {
+				                $valor_referencia = ($meta_atingida[$i] == '-') ? (0) : ($meta_atingida[$i]);
+				            }
+				            $situacao = ($valor_referencia / $meta);
+				            if ($situacao >= 0.9) {
+				                $sinalizacao[$i] = 'green.png';
+				                $title[$i] = 'Resultado esperado! O resultado superou 90% em relação a meta';
+				            } else if ($situacao > 0.6 && $situacao < 0.9) {
+				                $sinalizacao[$i] = 'yellow.png';
+				                $title[$i] = 'Atenção! O resultado pelo menos 60% da meta';
+				            } else {
+				                $sinalizacao[$i] = 'red.png';
+				                $title[$i] = 'Abaixo do esperado! O resultado está inferior a 60% da meta';
+				            }
+				        } else {
+				            $sinalizacao[$i] = 'grey.png';
+				            $title[$i] = 'Indicador indisponível';
+				        }
+				        /** Fim * */
+				        $daores->fechar();
+				        
+				        
+				    ?>
+				    
+				        <h3><?php print $periodo[$i]; ?></h3>
+				        <div>
+				        <legend>Indicador </legend>
+				        
+				            <p>Resultado: <?php print str_replace('.', ',', $meta_atingida[$i]); ?> </p>
+				            <p>Situação:<a href="#" class="help" data-trigger="hover" data-content='<?php print $title[$i]; ?>' title="Significado" ><img src="webroot/img/bullet-<?php print $sinalizacao[$i]; ?>" width="22" height="22" /></a></p>
+				            <p>Análise Crítica: <?php print ($analise); ?></p>
+				            <?php if ($objetometa->getCumulativo() == "1"): // Caso seja quantitativo    ?>
+				                <p><span class="label" style="color: black;">Total:</span><span  class="descricao"> <?php print str_replace('.', ',', $total_array[$i]); ?></span></p>
+				            <?php endif; ?>
+				            
+				            
+				          <div class="row">
+					          <div class="col-md-1 text-center">
+						            <form method="post" action="<?php print Utils::createLink('painelmedicao', 'painelmed') ?>">
+							            	<input type="hidden" name="codDocumento" value="<?php print ($objdoc->getCodigo()); ?>">
+							            	<input class="btn btn-info" style="border: inherit;" type="submit" name="teste" value="Voltar" />
+							        </form>
+						      </div>
+						      <div class="col-md-1 text-center">
+						        <form method="post" action="<?php print Utils::createLink('painelmedicao', 'geragrafico2') ?>">
+						        	  <input type="hidden" name="coddoc" value="<?php print ($objdoc->getCodigo()); ?>">	
+						        
+				                		<input type="hidden" name="total_meta" value="<?php print ($total_array[$i]); ?>">	
+						        		<input type="hidden" name="mata_atingida" value="<?php print ($meta_atingida[$i]); ?>">
+						        		<input type="hidden" name="cumulativo" value="<?php print ($objetometa->getCumulativo()); ?>">
+						        		<input type="hidden" name="periodo_meta" value="<?php print ($objetometa->getPeriodo()); ?>">
+						        		<input type="hidden" name="periodo" value="<?php print ($periodo[$i]); ?>">
+						        		<input type="hidden" name="codIndicador" value="<?php print ($objetoind->getCodigo()); ?>">
+						        		<input type="hidden" name="nomeIndicador" value="<?php print ($objetoind->getNome()); ?>">
+						            	<input type="hidden" name="codMapaIndicador" value="<?php print ($mapaindicador->getCodigo()); ?>">
+						            	<input class="btn btn-info" style="border: inherit;" type="submit" name="teste2" value="Visualizar Gráfico" />
+						        </form>
+						       </div>
+				           </div>
+				 
+				 <?php   
+				  //---------------- INICIATIVA
+				                
+				                $daoii=new IndicIniciativaDAO();
+				                //$rows=$daoii->iniciativaPorMapIndicador($objmeta->getMapaindicador()->getCodigo());
+				                $rows=$daoii->iniciativaPorMapIndicador($objmapa[$indicemapa]->getMapaindicador()->getCodigo());
+				                
+				                $objini=array();
+				                $ind=0;
+				                
+				                foreach ($rows as $r){
+				                   $objini[$ind]=new Iniciativa();                
+				                    $objini[$ind]->setCodIniciativa($r['codIniciativa']);                 
+				                    $objini[$ind]->setNome($r['nome']);
+				                    $objini[$ind]->setFinalidade($r['finalidade']);
+				                    $objini[$ind]->criaIndicIniciativa($r['codindinic'],$objmapa[$indicemapa]->getMapaindicador());
+				                    $ind++;
+				                }
+				
+				echo '<br>';
+				
+				$daorini=new ResultIniciativaDAO();
+				
+				for ($j=0;$j<count($objini);$j++){
+				  //  echo "for ".$objini[$i]->getIndicIniciativa()->getCodigo().','. $sessao->getAnobase().','.$i;
+				    $rows=$daorini->iniciativaPorResultado($objini[$j]->getCodIniciativa(), $sessao->getAnobase(),$i+1);
+				    foreach  ($rows as $row){
+				    	
+				        $objini[$j]->criaResultIniciativa($row['codResultIniciativa'],$objcal->getCodigo()==$row['codCalendario']?$objcal:NULL,
+				            $row['situacao'],$row['pfcapacit'],$row['pfrecti'],$row['pfinfraf'],$row['pfrecf'],$row['pfplanj'],$row['outros'],$row['periodo']
+				            );
+				              	   
+				    }  
+				}
+				?>
+				        
+				            <legend>Iniciativa(s) </legend>
+				            <?php 
+				        
+				         
+				            
+				            
+				for ($j=0;$j<count($objini);$j++){
+				            ?>
+				    <div>
+				        <input type="hidden" name="codindini<?php echo $j;?>" value="<?php print $objini[$j]->getIndicIniciativa()->getCodigo(); ?>" />
+				        <input type="hidden" name="codini<?php echo $j;?>" value="<?php print   $objini[$j]->getCodiniciativa(); ?>" />  
+				    </div>
+				  
+				  
+							
+				                <table>
+				                <tr>
+				                        <td>Iniciativa:</td>
+				                        <td> <?php echo $objini[$j]->getNome(); ?></td>
+				                    </tr>
+				                    <tr>
+				                        <td>Finalidade da iniciativa:</td>
+				                        <td> <?php echo $objini[$j]->getFinalidade(); ?></td>
+				                    </tr>
+				                    <tr>
+				                        <td><strong>Situação</strong></td>
+				                        <td>
+				                             <?php echo $objini[$j]->getResultiniciativa()->getSituacao()==1?"Não iniciado":""; ?>
+				                                     <?php echo $objini[$j]->getResultiniciativa()->getSituacao()==2?"Em atraso":"";  ?>
+				                                     <?php echo $objini[$j]->getResultiniciativa()->getSituacao()==3?"Com atrasos crítico":"";  ?> 
+				                                     <?php echo $objini[$j]->getResultiniciativa()->getSituacao()==4?"Em andamento normal":"";  ?> 
+				                                     <?php echo $objini[$j]->getResultiniciativa()->getSituacao()==5?"Concluído":"";  ?> 
+				                           </td>
+				                    </tr>
+				                    <tr>
+				                        <td><strong>Fatores que influenciarama situação atual:</strong></td>
+				                        
+				                        <td>
+				                        
+				                        
+				                        <ul>
+				                        <?php echo ($objini[$j]->getResultiniciativa()->getPfcapacit()==1)?  "<li>Capacitação</li>": ""; ?>
+				                        <?php echo ($objini[$j]->getResultiniciativa()->getPfrecti()==1)? "<li>Recursos de Tecnologia da Informação</li>":""; ?>
+				                        <?php echo ($objini[$j]->getResultiniciativa()->getPfinfraf()==1)? "<li>Infraestrutura Física</li>":""; ?>
+				                        <?php echo ($objini[$j]->getResultiniciativa()->getPfrecf()==1)?"<li>Recursos financeiros</li>":""; ?>
+				                        <?php echo($objini[$j]->getResultiniciativa()->getPfplanj()==1)?"<li>Planejamento</li>":""; ?>
+				                        <?php echo ($objini[$j]->getResultiniciativa()->getOutros()!=NULL)?"<li>".$objini[$j]->getResultiniciativa()->getOutros()."</li>":""; ?></li>
+				                        
+				                        
+				                        </ul>  </td>
+				                      
+				                    </tr>
+				                   
+				                    
+				                         
+				                    </table>
+				
+								
+				            
+				<?php }//for objiniresult 
+ 
+ //------------------------------       
+        
+     }
+ }//for do periodo?>
+  </div>
+		<?php 		}//nao tem resultado?>
+        
+ </div>

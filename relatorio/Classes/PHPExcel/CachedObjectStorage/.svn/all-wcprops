@@ -1,0 +1,83 @@
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/CachedObjectStorage
+END
+MemorySerialized.php
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/CachedObjectStorage/MemorySerialized.php
+END
+SQLite.php
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/CachedObjectStorage/SQLite.php
+END
+APC.php
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/CachedObjectStorage/APC.php
+END
+Igbinary.php
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/CachedObjectStorage/Igbinary.php
+END
+Memcache.php
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/CachedObjectStorage/Memcache.php
+END
+PHPTemp.php
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/CachedObjectStorage/PHPTemp.php
+END
+ICache.php
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/CachedObjectStorage/ICache.php
+END
+SQLite3.php
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/CachedObjectStorage/SQLite3.php
+END
+CacheBase.php
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/CachedObjectStorage/CacheBase.php
+END
+MemoryGZip.php
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/CachedObjectStorage/MemoryGZip.php
+END
+Memory.php
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/CachedObjectStorage/Memory.php
+END
+Wincache.php
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/CachedObjectStorage/Wincache.php
+END
+DiscISAM.php
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/sisraa_repositorio/!svn/ver/1/sisraa/sistema/relatorio/Classes/PHPExcel/CachedObjectStorage/DiscISAM.php
+END

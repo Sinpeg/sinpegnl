@@ -1,0 +1,52 @@
+8
+
+dir
+14
+http://10.1.19.179/svn/sisraa_repositorio/sisraa/sistema/modulo/painelmedicao/dao
+http://10.1.19.179/svn/sisraa_repositorio
+
+
+
+2018-07-31T18:23:14.307199Z
+1
+dinfi
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+f459bd6a-6f71-459b-a450-08f2ec089600
+
+ObjetivoDAO.php
+file
+
+
+
+
+2018-07-31T18:25:23.000000Z
+05767c91b337dc13fe04615cff7a3b85
+2018-07-31T18:23:14.307199Z
+1
+dinfi
+
+PerspectivaDAO.php
+file
+
+
+
+
+2018-07-31T18:25:23.000000Z
+108fa28287822c6e54cde5f770da4894
+2018-07-31T18:23:14.307199Z
+1
+dinfi
+

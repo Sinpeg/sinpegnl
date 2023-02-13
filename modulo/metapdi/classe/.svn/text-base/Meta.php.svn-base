@@ -1,0 +1,110 @@
+<?php
+
+class Meta {
+
+    private $codigo;
+    private $mapaindicador;
+    private $calendario;
+    private $periodo;
+    private $meta;
+    private $ano;
+    private $metrica; /* P - Percentual; Q - Quantitativo; */
+    private $cumulativo; // bandeira que indica se a meta é cumulativa ou não
+    private $resultado;
+    
+    
+    public function __construct(){
+       
+    }
+    
+    public function setCodigo($codigo) {
+        $this->codigo = $codigo;
+    }
+
+    public function getCodigo() {
+        return $this->codigo;
+    }
+
+     public function setMapaindicador($mapaindicador) {
+        $this->mapaindicador = $mapaindicador;
+    }
+
+    public function getMapaindicador() {
+        return $this->mapaindicador;
+    }
+    
+     public function setCalendario($calendario) {
+        $this->calendario = $calendario;
+    }
+
+    public function getCalendario() {
+        return $this->calendario;
+    }
+
+    
+    public function setPeriodo($periodo) {
+        $this->periodo = $periodo;
+    }
+
+    public function getPeriodo() {
+        return $this->periodo;
+    }
+
+    public function setMeta($meta) {
+        $this->meta = $meta;
+    }
+
+    public function getMeta() {
+        return $this->meta;
+    }
+
+    public function setAno($ano) {
+    	$this->ano = $ano;
+    }
+    
+    public function getAno() {
+    	return $this->ano;
+    }
+
+    public function setMetrica($metrica) {
+        $this->metrica = $metrica;
+    }
+
+    public function getMetrica() {
+        return $this->metrica;
+    }
+
+   
+    public function setCumulativo($cumulativo) {
+        $this->cumulativo = $cumulativo;
+    }
+    
+    public function getCumulativo() {
+        return $this->cumulativo;
+    }
+    
+       public function setResultado($resultado) {
+        $this->resultado = $resultado;
+    }
+    
+    public function getResultado() {
+        return $this->resultado;
+    }
+    
+   public function criaResultado($codigo,$meta_atingida,$periodo,$analiseCritica,$acaopdi){
+       $this->resultado=new Resultado();
+       $this->resultado->setCodigo($codigo);
+       $this->resultado->setMetaAtingida($meta_atingida);
+       $this->resultado->setPeriodo($periodo) ;
+       $this->resultado->setAnaliseCritica($analiseCritica);
+       $this->resultado->setMeta($this);
+       $this->resultado->setAcao($acaopdi);
+
+   
+   }
+   
+
+
+}
+
+?>

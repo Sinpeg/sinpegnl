@@ -1,0 +1,119 @@
+<?php
+$sessao = $_SESSION['sessao'];
+$aplicacoes = $sessao->getAplicacoes();
+//$anobase = $sessao->getAnobase();
+//$codunidade = $sessao->getCodUnidade();
+$codestruturado = $sessao->getCodestruturado();
+?>
+<?php
+if (!$aplicacoes[39]) {
+    print "Erro ao acessar esta aplicação";
+    exit();
+}
+?>
+<?php
+$anobase = $sessao->getAnobase();
+$codunidade = $sessao->getCodUnidade();
+$unidade = new Unidade();
+$unidade->setCodunidade($codunidade);
+$daodoc = new DocumentoDAO();
+$rows = $daodoc->lista();
+$objdoc = array();
+$cont = 0;
+
+foreach ($rows as $row) {
+    $objdoc[$cont] = new Documento();
+    $objdoc[$cont]->setCodigo($row['codigo']);
+    $objdoc[$cont]->setNome($row['nome']);
+    $objdoc[$cont]->setAnoInicial($row['anoinicial']);
+    $objdoc[$cont]->setAnoFinal($row['anofinal']);
+    $cont++;
+}
+$daomapa = new MapaDAO();
+$objmapa = array();
+$cont1 = 0;
+for ($i = 0; $i < $cont; $i++) {
+    $rows = $daomapa->buscamapadocumento($objdoc[$i]->getCodigo());
+    foreach ($rows as $row) {
+        $objmapa[$cont1] = new Mapa();
+        $objmapa[$cont1]->setCodigo($row['Codigo']);
+        $objmapa[$cont1]->setObjetivo($row['Objetivo']);
+        $objmapa[$cont1]->setDocumento($objdoc[$i]);
+        $cont1++;
+    }
+}
+$daoind = new IndicadorDAO();
+$objind = array();
+$cont2 = 0;
+for ($i = 0; $i < $cont1; $i++) {
+    $rows = $daoind->buscaindicadorpormapa2($objmapa[$i]->getCodigo());
+    foreach ($rows as $row) {
+        $unidades_pdi = array(945, 948, 949, 950, 951, 952, 953, 954, 957, 962, 964,
+            966, 2504);
+        if ($row['PropIndicador'] == $codunidade || in_array($codunidade, $unidades_pdi)) {
+            $objind[$cont2] = new Indicador();
+            $objind[$cont2]->setMapa($objmapa[$i]);
+            $objind[$cont2]->setCodigo($row['Codigo']);
+            $objind[$cont2]->setIndicador($row['indicador']);
+            $cont2++;
+        }
+    }
+}
+?>
+<form name="adicionar" method="POST" action="ajax/metapdi/registrameta.php">
+    <fieldset>
+        <legend>Registrar Meta</legend>
+        <div id="resultado">
+        </div>
+        <div>
+            <label>Documento:</label>
+            <select name="documento" id="documento" class="sel1">
+                <option value="0">Selecione o documento...</option>
+                <?php
+                $nomedoc = 'default';
+                for ($i = 0; $i < $cont2; $i++) {
+                    if ($objind[$i]->getMapa()->getDocumento()->getNome() != $nomedoc) {
+                        $nomedoc = $objind[$i]->getMapa()->getDocumento()->getNome();
+                        ?> 
+                        <option value="<?php print $objind[$i]->getMapa()->getDocumento()->getCodigo(); ?>"><?php print $nomedoc; ?></option>
+                    <?php } ?>
+                <?php } ?>
+            </select>
+        </div>
+        <div class="objetivo">
+            <label>Objetivo:</label>
+            <select class="sel1" name="objetivo">
+                <option value="0">Selecione um objetivo...</option> 
+            </select>
+        </div>
+        <div class="indicador">
+            <label>Indicador:</label>
+            <select class="sel1" name="indicador">
+                <option value="0">Selecione um indicador...</option> 
+            </select>
+        </div>
+        <div>
+            <label>Meta:</label>
+            <input type="text" class="short" name="meta"/>
+        </div>
+        <div>
+            <label>Período de coleta: </label>
+            <span class="intermediario"><input type="radio" value="M" name="coleta" />Mensal</span>
+            <span class="intermediario"><input type="radio" value="T" name="coleta" />Trimestral</span>
+            <span class="intermediario"><input type="radio" value="S" name="coleta" />Semestral</span>
+            <span class="intermediario"><input type="radio" value="A" name="coleta" />Anual</span>
+        </div>
+        <div>
+            <span class="intermediario">Métrica:</span>
+            <span class="intermediario"><input type="radio" value="p" name="metrica" />Percentual</span>
+            <span class="intermediario"><input type="radio" value="q" name="metrica" />Quantitativo</span>
+        </div>
+        <div>
+            <span class="intermediario">Marque se o resultado para esta meta é cumulativo:</span>
+            <input type="checkbox" name="tipometa"/>
+        </div>
+        <div>
+            <input type="button" value="Salvar" name="salvar" class="btn btn-info" />
+        </div>
+    </fieldset>
+</form>

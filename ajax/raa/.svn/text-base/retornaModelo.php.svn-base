@@ -1,0 +1,101 @@
+<?php
+require '../../classes/sessao.php';
+require_once '../../dao/PDOConnectionFactory.php';
+require_once '../../modulo/raa/dao/modeloDAO.php';
+require_once '../../modulo/raa/dao/textoDAO.php';
+require_once '../../modulo/raa/classes/topico.php';
+require_once '../../modulo/raa/classes/texto.php';
+require '../../classes/unidade.php';
+
+session_start();
+$sessao = new Sessao();
+$sessao = $_SESSION['sessao'];
+$anobase = $sessao->getAnobase();
+$codunidade = $sessao->getCodUnidade();
+$codtexto = $_POST['codtexto'];
+$codTopico = $_POST['codTopico'];
+
+
+$mdao= new ModeloDAO();
+$t=new Topico();
+$t->setCodigo($codTopico);
+ /*
+  $mrows=$mdao->buscarmodelosUniTopAno1($codTopico, $anobase,$codunidade);
+
+  foreach ($mrows as $r){
+ 		//echo "buscaModeloParaTopico ---passou-".$r['codigo']."-". $r['legenda']."-". $r['descModelo'];
+ 		$t->adicionaItemModelo($r['codigo'], $r['legenda'], $r['descModelo'], $r['anoInicio'], $r['anofinal'], $r['codUnidade'], $r['situacao'],$r['ordemInTopico']);
+	} */
+
+$tdao= new TextoDAO();
+
+$trows=$tdao->buscaTexto($codTopico, $anobase,$codunidade);
+
+/*foreach ($trows as $r){
+	
+	$uniTexto=new Unidade();
+	$uniTexto->setCodunidade($r['codUnidade']);
+	$t->criaTexto($row['codtexto'],$row['texto'],$uniTexto,$row['ano']);
+	
+}*/
+
+?>
+<script>							
+							$("#gravatopico<?php print $t->getCodigo()?>").click(function() {
+								   $.ajax({
+								      url:"ajax/raa/registraTexto.php",
+								      type: "POST",
+								      data: $("form[name=frm<?php print $t->getCodigo();?>]").serialize(),
+								      success: function(data) {
+								           $("div#msg<?php print $t->getCodigo()?>").html(data);
+								      }
+								     
+								  });
+								});
+							 $(document).ready(function() {
+									var teste="#area<?php print $t->getCodigo()?>";
+									  $(teste).summernote({
+										  height: 450,
+										  lang:'pt-BR',
+									      placeholder: 'Redija o texto!',	       
+									  });
+								});
+							
+
+														</script>
+<form method="post"  name="frm<?php print $t->getCodigo();?>" >
+<div id="msg<?php print $t->getCodigo()?>"></div>
+               <input type="hidden" name="codunidade>" value="<?php print $codunidade;?>" />
+               <input type="hidden" name="anobase" value="<?php print $anobase;?>" />
+		       <input type="hidden" name="codtopico" value="<?php print $codTopico?>" />
+		       
+	              
+<textarea id="area<?php print $codTopico;?>" name="texto">
+
+<?php 
+$codtexto='';
+	    $passou=0;
+	    
+	foreach ($trows as $r){
+		print $r['texto'];	
+		$codtexto=$r['codigo'];
+	    $passou=1;
+		
+	   }
+	$rowsa=$mdao->buscarmodelosUniTopAno1($codTopico,$anobase,$codunidade);
+	if ($passou==0){
+		
+    foreach ($rowsa as $r){
+     		print($r['legenda'].$r['descModelo']);
+    
+}
+	}
+     		?>
+     	</textarea>
+       <input type="hidden" name="codtexto" value="<?php print $codtexto?>" />
+		        
+<br>
+<input type="button" name="acao" value="Concluir"  id="gravatopico<?php print $t->getCodigo();?>"  class="btn btn-primary btn">
+</form>
+
+

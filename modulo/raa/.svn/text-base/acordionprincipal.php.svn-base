@@ -1,0 +1,9 @@
+<h3>
+		        	<?php 
+		        	print "<span onclick=carregaModelo(".$t->getCodigo().")>".$t->getNivel().$t->getNome()."</span>"; ?>
+</h3>
+<div id="ac<?php print $t->getCodigo();?>">
+         
+   		
+		       
+</div>
